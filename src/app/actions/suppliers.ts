@@ -30,7 +30,7 @@ const GUARANTOR_FIELDS: Record<string, string> = {
 async function _fetchSuppliers(params?: { search?: string; page?: number; pageSize?: number }) {
   let query = supabaseAdmin
     .from('suppliers')
-    .select('id, contact_id, bank, account_number, branch, company_id, contact:contacts!inner(*)', { count: 'exact' })
+    .select('id, contact_id, bank, account_number, branch, contact:contacts!inner(*)', { count: 'exact' })
     .eq('contacts.is_active', true)
     .order('name', { referencedTable: 'contacts', ascending: true });
 
@@ -79,7 +79,6 @@ function buildSupplierRolePayload(formData: FormData) {
     bank: formData.get('bank') as string || null,
     account_number: formData.get('account_number') as string || null,
     branch: formData.get('branch') as string || null,
-    company_id: formData.get('company_id') as string || null,
   };
 }
 
@@ -184,7 +183,7 @@ export async function updateSupplier(id: string, formData: FormData) {
 
   const { data: current } = await supabaseAdmin
     .from('suppliers')
-    .select('contact_id, bank, account_number, branch, company_id, contact:contacts(*)')
+    .select('contact_id, bank, account_number, branch, contact:contacts(*)')
     .eq('id', id)
     .single();
 
@@ -377,7 +376,7 @@ export async function deleteGuarantor(id: string) {
 async function _fetchSupplierById(id: string) {
   const { data, error } = await supabaseAdmin
     .from("suppliers")
-    .select("id, contact_id, bank, account_number, branch, company_id, contact:contacts(*)")
+    .select("id, contact_id, bank, account_number, branch, contact:contacts(*)")
     .eq("id", id)
     .single();
   if (error || !data) return null;
