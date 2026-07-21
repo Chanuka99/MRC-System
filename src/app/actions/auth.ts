@@ -59,6 +59,11 @@ export async function loginAction(formData: FormData) {
     return { error: 'Authentication is not configured on this deployment.' };
   }
 
+  // Diagnostic
+  const { count: userCount, error: dbCheckErr } = await supabaseAdmin.from('users').select('*', { count: 'exact', head: true });
+  console.error('[LOGIN] URL:', process.env.NEXT_PUBLIC_SUPABASE_URL);
+  console.error('[LOGIN] Users count:', dbCheckErr ? `ERR:${dbCheckErr.message}` : userCount);
+
   const normalizedUsername = username.trim().toLowerCase();
   const { data: user, error } = await supabaseAdmin
     .from('users')
