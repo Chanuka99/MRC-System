@@ -67,11 +67,9 @@ export async function loginAction(formData: FormData) {
     .single();
 
   if (error) {
-    console.error('[LOGIN] DB error:', JSON.stringify({ message: error.message, code: error.code, details: error.details, hint: error.hint }));
     return { error: 'Invalid username or password' };
   }
   if (!user) {
-    console.error('[LOGIN] User not found for username:', normalizedUsername);
     return { error: 'Invalid username or password' };
   }
 
@@ -89,11 +87,8 @@ export async function loginAction(formData: FormData) {
   }
 
   if (!passwordMatch) {
-    console.error('[LOGIN] Password mismatch for user:', user.id, user.username);
     return { error: 'Invalid username or password' };
   }
-
-  console.error('[LOGIN] Password OK for user:', user.id, user.username);
 
   // Fetch optional TOTP/token fields separately (may not exist on all DB instances)
   let tokenVersion = 0;
