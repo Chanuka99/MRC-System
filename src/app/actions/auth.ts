@@ -128,7 +128,7 @@ export async function loginAction(formData: FormData) {
   const sessionUser: SessionUser = {
     id: user.id, username: user.username, full_name: user.full_name,
     role: user.role, email: user.email, avatar_url: user.avatar_url,
-    token_version: user.token_version,
+    token_version: tokenVersion,
   };
   cookieStore.set(SESSION_COOKIE, createSession(sessionUser), {
     httpOnly: true, secure: process.env.NODE_ENV === 'production',
