@@ -70,7 +70,7 @@ export async function getVehicleById(id: string): Promise<Vehicle | null> {
   await requireAuth();
   const { data, error } = await supabaseAdmin
     .from('vehicles')
-    .select('*, supplier:suppliers(id, contact_id, bank, account_number, branch, company_id, contact:contacts(name)), company:companies(id, name), photos:vehicle_photos(*), rate_tiers(*)')
+    .select('*, supplier:suppliers(id, contact_id, bank, account_number, branch, contact:contacts(name)), company:companies(id, name), photos:vehicle_photos(*), rate_tiers(*)')
     .eq('id', id)
     .single();
   if (error || !data) return null;
