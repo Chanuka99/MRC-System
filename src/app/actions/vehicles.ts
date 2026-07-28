@@ -27,7 +27,7 @@ async function _fetchVehicles(params?: {
 }) {
   let query = supabaseAdmin
     .from('vehicles')
-    .select('id, reg_number, brand, model, year, type, source, daily_rate, current_km, next_service_km, next_service_date, status, created_at', { count: 'exact' })
+    .select('id, reg_number, brand, model, year, type, source, daily_rate, current_km, next_service_km, next_service_date, status, created_at, rate_tiers:rate_tiers(*)', { count: 'exact' })
     .eq('is_active', true)
     .order('created_at', { ascending: false });
 

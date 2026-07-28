@@ -87,7 +87,7 @@ export default function NewRentalClient({ vehicles, customers, guarantors, activ
   }, []);
 
   const { days, subtotal } = startDate && endDate && dailyRate > 0
-    ? calculateRentalAmount(startDate, endDate, dailyRate)
+    ? calculateRentalAmount(startDate, endDate, dailyRate, selectedVehicle?.rate_tiers)
     : { days: 0, subtotal: 0 };
   const total = subtotal + additionalCharges - discount;
 
