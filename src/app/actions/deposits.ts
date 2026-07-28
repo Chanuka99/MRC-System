@@ -34,7 +34,7 @@ async function _fetchRefundableDeposits(params?: { page?: number; pageSize?: num
 
   const flattened = (data ?? []).map((row) => ({
     ...row,
-    customer: row.customer ? flattenContact(row.customer as Record<string, unknown>) : null,
+    customer: row.customer ? flattenContact(row.customer as unknown as Record<string, unknown>) : null,
   }));
 
   return {
