@@ -301,12 +301,22 @@ export default function RentalDetailClient({ rental: initial, availableVehicles 
                   </div>
 
                   {/* Pricing card */}
-                  <div className="bg-white border border-gray-200 rounded-xl p-5">
+                   <div className="bg-white border border-gray-200 rounded-xl p-5">
                     <p className="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-4">Pricing</p>
                     <div className="space-y-2 text-sm">
                       <div className="flex justify-between">
-                        <span className="text-gray-600">Amount ({formatCurrency(rental.daily_rate)} &times; {rental.total_days}d)</span>
-                        <span className="font-semibold text-gray-900">{formatCurrency(rental.total_amount ?? 0)}</span>
+                        <span className="text-gray-600">Subtotal ({formatCurrency(rental.daily_rate)} &times; {rental.total_days}d)</span>
+                        <span className="font-semibold text-gray-900">{formatCurrency(baseAmount)}</span>
+                      </div>
+                      {extraCharges > 0 && (
+                        <div className="flex justify-between"><span className="text-gray-500">Extra Charges</span><span className="text-gray-600">+ {formatCurrency(extraCharges)}</span></div>
+                      )}
+                      {discount > 0 && (
+                        <div className="flex justify-between"><span className="text-gray-500">Discount</span><span className="text-red-600">- {formatCurrency(discount)}</span></div>
+                      )}
+                      <div className="flex justify-between pt-3 border-t font-semibold">
+                        <span className="text-gray-900">Total</span>
+                        <span className="text-gray-900">{formatCurrency(finalAmount)}</span>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-gray-600">Advance Paid</span>
@@ -316,12 +326,6 @@ export default function RentalDetailClient({ rental: initial, availableVehicles 
                         <span className="text-gray-600">Deposit</span>
                         <span className="text-gray-500">- {formatCurrency(rental.deposit ?? 0)}</span>
                       </div>
-                      {extraCharges > 0 && (
-                        <div className="flex justify-between"><span className="text-gray-500">Extra Charges</span><span className="text-gray-600">+ {formatCurrency(extraCharges)}</span></div>
-                      )}
-                      {discount > 0 && (
-                        <div className="flex justify-between"><span className="text-gray-500">Discount</span><span className="text-gray-600">- {formatCurrency(discount)}</span></div>
-                      )}
                       {netBalance !== 0 && (
                         <div className="flex justify-between pt-3 border-t font-semibold">
                           <span className="text-gray-900">{netBalance > 0 ? "Balance Due" : "Refund Due"}</span>
