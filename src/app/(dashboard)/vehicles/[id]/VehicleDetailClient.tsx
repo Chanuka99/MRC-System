@@ -579,6 +579,24 @@ export default function VehicleDetailClient({ vehicle: initial, suppliers, compa
     fd.set("model", editModel);
     fd.set("daily_rate", rateTiers.length > 0 ? rateTiers[0].rate_per_day.toString() : "0");
     fd.set("rate_tiers", JSON.stringify(rateTiers.map(t => ({ days_from: t.days_from, days_to: t.days_to, rate_per_day: t.rate_per_day }))));
+
+    const customerRate = parseFloat(fd.get('customer_extra_km_rate') as string || '0');
+    if (!customerRate || customerRate <= 0) {
+      setError("Extra KM Charge (Customer) is required.");
+      return;
+    }
+    if (editSource === "Supplier") {
+      const supplierRate = parseFloat(fd.get('supplier_extra_km_rate') as string || '0');
+      if (!supplierRate || supplierRate <= 0) {
+        setError("Supplier Extra KM Rate is required.");
+        return;
+      }
+      if (customerRate < supplierRate) {
+        setError("Extra KM Charge (Customer) must be greater than or equal to Supplier Extra KM Rate.");
+        return;
+      }
+    }
+
     setEditFormData(fd);
     setError(null);
     setConfirmEdit(true);
@@ -745,8 +763,8 @@ export default function VehicleDetailClient({ vehicle: initial, suppliers, compa
               {editSource === "Supplier" && (
                 <div className="mt-2">
                   <div>
-                    <label className="form-label text-sm">Supplier Extra KM Rate (LKR)</label>
-                    <input name="supplier_extra_km_rate" type="number" min="0" step="0.01" defaultValue={vehicle.supplier_extra_km_rate ?? 0} className="form-input text-sm" />
+                    <label className="form-label text-sm">Supplier Extra KM Rate (LKR) <span className="text-red-500 ml-0.5">*</span></label>
+                    <input name="supplier_extra_km_rate" type="number" min="1" required step="0.01" defaultValue={vehicle.supplier_extra_km_rate ?? 0} className="form-input text-sm" />
                     <p className="text-xs text-gray-400 mt-1">Per-km rate paid to supplier for excess</p>
                   </div>
                 </div>
@@ -832,8 +850,8 @@ export default function VehicleDetailClient({ vehicle: initial, suppliers, compa
                 </div>
                 <div className="grid grid-cols-1 gap-3 mb-4">
                   <div>
-                    <label className="form-label text-sm">Extra KM Charge (LKR/km)</label>
-                    <input name="customer_extra_km_rate" type="number" min="0" step="0.01" defaultValue={vehicle.customer_extra_km_rate ?? 0} className="form-input text-sm" />
+                    <label className="form-label text-sm">Extra KM Charge (LKR/km) <span className="text-red-500 ml-0.5">*</span></label>
+                    <input name="customer_extra_km_rate" type="number" min="1" required step="0.01" defaultValue={vehicle.customer_extra_km_rate ?? 0} className="form-input text-sm" />
                     <p className="text-xs text-gray-400 mt-1">Per-km rate charged to customer</p>
                   </div>
                 </div>

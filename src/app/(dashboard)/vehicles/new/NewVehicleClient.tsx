@@ -147,6 +147,23 @@ export default function NewVehicleClient({ suppliers, companies }: { suppliers: 
       return;
     }
 
+    const customerRate = parseFloat(fd.get('customer_extra_km_rate') as string) || 0;
+    if (!customerRate || customerRate <= 0) {
+      setError("Extra KM Charge (Customer) is required.");
+      return;
+    }
+    if (source === "Supplier") {
+      const supplierRate = parseFloat(fd.get('supplier_extra_km_rate') as string || '0');
+      if (!supplierRate || supplierRate <= 0) {
+        setError("Supplier Extra KM Rate is required.");
+        return;
+      }
+      if (customerRate < supplierRate) {
+        setError("Extra KM Charge (Customer) must be greater than or equal to Supplier Extra KM Rate.");
+        return;
+      }
+    }
+
     // Override brand/model from state (controlled)
     fd.set("brand", brand);
     fd.set("model", model);
@@ -359,8 +376,8 @@ export default function NewVehicleClient({ suppliers, companies }: { suppliers: 
                 </p>
               </div>
               <div>
-                <label className="form-label">Supplier Extra KM Rate (LKR/km)</label>
-                <input name="supplier_extra_km_rate" type="number" min="0" step="0.01" defaultValue="0" className="form-input" />
+                <label className="form-label">Supplier Extra KM Rate (LKR/km) <span className="text-red-500">*</span></label>
+                <input name="supplier_extra_km_rate" type="number" min="1" required step="0.01" defaultValue="0" className="form-input" />
                 <p className="text-xs text-gray-400 mt-1">Per-km rate paid to supplier for excess</p>
               </div>
             </>
@@ -530,8 +547,8 @@ export default function NewVehicleClient({ suppliers, companies }: { suppliers: 
 
           <div className="grid grid-cols-1 gap-3 mb-5">
             <div>
-              <label className="form-label">Extra KM Charge (LKR/km)</label>
-              <input name="customer_extra_km_rate" type="number" min="0" step="0.01" defaultValue="0" className="form-input text-sm" />
+              <label className="form-label">Extra KM Charge (LKR/km) <span className="text-red-500">*</span></label>
+              <input name="customer_extra_km_rate" type="number" min="1" required step="0.01" defaultValue="0" className="form-input text-sm" />
               <p className="text-xs text-gray-400 mt-1">Per-km rate charged to customer for excess</p>
             </div>
           </div>
