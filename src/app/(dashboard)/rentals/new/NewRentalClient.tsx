@@ -120,6 +120,10 @@ export default function NewRentalClient({ vehicles, customers, guarantors, activ
       setError("Pickup KM is required.");
       return;
     }
+    if (pickupKm < (selectedVehicle?.current_km ?? 0)) {
+      setError(`Pickup KM must be at least the vehicle's current reading (${selectedVehicle?.current_km ?? 0}).`);
+      return;
+    }
     startTransition(async () => {
       const result = await createRental({
         vehicle_id: vehicleId,
@@ -311,7 +315,7 @@ export default function NewRentalClient({ vehicles, customers, guarantors, activ
               </div>
               <div>
                 <label className="form-label">Current KM (Pickup) <span className="text-red-500">*</span></label>
-                <input type="number" className="form-input" value={pickupKm} onChange={e => setPickupKm(+e.target.value)} />
+                <input type="number" className="form-input" value={pickupKm} min={selectedVehicle?.current_km ?? 0} onChange={e => setPickupKm(+e.target.value)} />
               </div>
               <div>
                 <label className="form-label">Notes</label>
