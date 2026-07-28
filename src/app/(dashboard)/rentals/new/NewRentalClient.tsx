@@ -339,7 +339,7 @@ export default function NewRentalClient({ vehicles, customers, guarantors, activ
                 )}
               </div>
               <div>
-                <label className="form-label">Deposit (LKR)</label>
+                <label className="form-label">Refundable Deposit (LKR)</label>
                 <input type="number" className="form-input" value={deposit} onChange={e => setDeposit(e.target.value === "" ? "" : +e.target.value)} />
               </div>
               <div>
