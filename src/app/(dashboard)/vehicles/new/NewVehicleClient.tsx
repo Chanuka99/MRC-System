@@ -386,7 +386,7 @@ export default function NewVehicleClient({ suppliers, companies }: { suppliers: 
               </div>
               <div>
                 <label className="form-label">Supplier Extra KM Rate (LKR/km) <span className="text-red-500">*</span></label>
-                <input name="supplier_extra_km_rate" type="number" min="1" required step="0.01" defaultValue="0" className="form-input" />
+                <input name="supplier_extra_km_rate" type="number" min="1" required step="0.01" className="form-input" />
                 <p className="text-xs text-gray-400 mt-1">Per-km rate paid to supplier for excess</p>
               </div>
             </>
@@ -558,7 +558,7 @@ export default function NewVehicleClient({ suppliers, companies }: { suppliers: 
           <div className="grid grid-cols-1 gap-3 mb-5">
             <div>
               <label className="form-label">Extra KM Charge (LKR/km) <span className="text-red-500">*</span></label>
-              <input name="customer_extra_km_rate" type="number" min="1" required step="0.01" defaultValue="0" className="form-input text-sm" />
+              <input name="customer_extra_km_rate" type="number" min="1" required step="0.01" className="form-input text-sm" />
               <p className="text-xs text-gray-400 mt-1">Per-km rate charged to customer for excess</p>
             </div>
           </div>
