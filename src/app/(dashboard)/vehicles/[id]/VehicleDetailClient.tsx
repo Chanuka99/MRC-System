@@ -942,6 +942,9 @@ export default function VehicleDetailClient({ vehicle: initial, suppliers, compa
                     ] : []),
                   ] : []),
                   { label: "Monthly Rate", value: (vehicle.monthly_rate ?? 0) > 0 ? formatCurrency(vehicle.monthly_rate!) : "—" },
+                  ...((vehicle.customer_extra_km_rate ?? 0) > 0 ? [
+                    { label: "Extra KM Charge", value: <span>{formatCurrency(vehicle.customer_extra_km_rate!)}/km</span> }
+                  ] : []),
                   { label: "Next Service KM", value: (vehicle.next_service_km || 0).toLocaleString() + " km" },
                 ].map(f => (
                   <div key={f.label}>
