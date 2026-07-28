@@ -103,7 +103,8 @@ async function _fetchRentals(params?: {
       guarantor:guarantors(id, contact_id, contact:contacts(name, phone))`,
       { count: 'exact' }
     )
-    .order('created_at', { ascending: false });
+    .order('created_at', { ascending: false })
+    .order('id', { ascending: true });
 
   if (params?.search) query = query.ilike('rental_number', `%${params.search}%`);
   if (params?.status && params.status !== 'all') query = query.eq('status', params.status);
