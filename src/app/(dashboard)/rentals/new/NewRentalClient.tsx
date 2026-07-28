@@ -453,7 +453,7 @@ export default function NewRentalClient({ vehicles, customers, guarantors, activ
             {/* Total calculation */}
             <div className="bg-blue-50 border border-blue-100 rounded-xl p-4 space-y-1.5 text-sm">
               <div className="flex justify-between"><span className="text-gray-600">Subtotal ({days}d × {formatCurrency(dailyRate)})</span><span>{formatCurrency(subtotal)}</span></div>
-              {discount > 0 && <div className="flex justify-between"><span className="text-gray-600">Discount</span><span className="text-green-600">−{formatCurrency(discount)}</span></div>}
+              {Number(discount) > 0 && <div className="flex justify-between"><span className="text-gray-600">Discount</span><span className="text-green-600">{formatCurrency(Number(discount))}</span></div>}
               <div className="flex justify-between font-bold text-base pt-1 border-t border-blue-200"><span>Total</span><span className="text-blue-700">{formatCurrency(total)}</span></div>
               <div className="flex justify-between"><span className="text-gray-600">Refundable Deposit</span><span>{formatCurrency(deposit || 0)}</span></div>
             </div>
