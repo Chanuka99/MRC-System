@@ -79,6 +79,9 @@ export default function RentalDetailClient({ rental: initial, availableVehicles 
   const baseAmount = Number(rental.subtotal ?? appliedRate * rentalDuration);
   const extraCharges = Number(rental.additional_charges ?? 0);
   const discount = Number(rental.discount ?? 0);
+  const depositAmount = Number(rental.deposit ?? 0);
+  const totalWithDeposit = baseAmount + depositAmount - discount;
+  const dueAtPickup = totalWithDeposit - advancePaid;
   const finalAmount = Number(rental.total_amount ?? (baseAmount + extraCharges - discount));
   const advancePaid = Number((rental as Rental & { amount_paid?: number }).amount_paid ?? rental.advance_paid ?? 0);
   const securityDepositAmount = Number(rental.security_deposit_amount ?? rental.deposit ?? 0);
@@ -308,24 +311,26 @@ export default function RentalDetailClient({ rental: initial, availableVehicles 
                         <span className="text-gray-600">Subtotal ({formatCurrency(rental.daily_rate)} &times; {rental.total_days}d)</span>
                         <span className="font-semibold text-gray-900">{formatCurrency(baseAmount)}</span>
                       </div>
-                      {extraCharges > 0 && (
-                        <div className="flex justify-between"><span className="text-gray-500">Extra Charges</span><span className="text-gray-600">+ {formatCurrency(extraCharges)}</span></div>
-                      )}
                       {discount > 0 && (
-                        <div className="flex justify-between"><span className="text-gray-500">Discount</span><span className="text-red-600">- {formatCurrency(discount)}</span></div>
+                        <div className="flex justify-between"><span className="text-gray-500">Discount</span><span className="text-green-600">−{formatCurrency(discount)}</span></div>
+                      )}
+                      <div className="flex justify-between">
+                        <span className="text-gray-600">Refundable Deposit</span>
+                        <span>+ {formatCurrency(depositAmount)}</span>
+                      </div>
+                      {advancePaid > 0 && (
+                        <div className="flex justify-between"><span className="text-gray-600">Advance Paid</span><span className="text-gray-500">−{formatCurrency(advancePaid)}</span></div>
                       )}
                       <div className="flex justify-between pt-3 border-t font-semibold">
                         <span className="text-gray-900">Total</span>
-                        <span className="text-gray-900">{formatCurrency(finalAmount)}</span>
+                        <span className="text-gray-900">{formatCurrency(totalWithDeposit)}</span>
                       </div>
-                      <div className="flex justify-between">
-                        <span className="text-gray-600">Advance Paid</span>
-                        <span className="text-gray-500">- {formatCurrency(rental.advance_paid ?? 0)}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-gray-600">Deposit</span>
-                        <span className="text-gray-500">- {formatCurrency(rental.deposit ?? 0)}</span>
-                      </div>
+                      {advancePaid > 0 && (
+                        <div className="flex justify-between font-semibold">
+                          <span className="text-gray-700">Due at Pickup</span>
+                          <span className="text-red-600">{formatCurrency(dueAtPickup)}</span>
+                        </div>
+                      )}
                       {netBalance !== 0 && (
                         <div className="flex justify-between pt-3 border-t font-semibold">
                           <span className="text-gray-900">{netBalance > 0 ? "Balance Due" : "Refund Due"}</span>
