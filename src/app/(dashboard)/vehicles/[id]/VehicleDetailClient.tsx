@@ -4,7 +4,7 @@ import { useState, useTransition, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
-import { Vehicle, Supplier, Rental, Company } from "@/types";
+import { Vehicle, Supplier, Rental, Company, RateTier } from "@/types";
 import { formatCurrency, formatDate } from "@/lib/utils";
 import { updateVehicle, deleteVehicle, uploadVehiclePhoto, deleteVehiclePhoto, getVehicleUpdates, addVehicleUpdate } from "@/app/actions/vehicles";
 import PasswordConfirmModal from "@/components/shared/PasswordConfirmModal";
@@ -495,7 +495,7 @@ export default function VehicleDetailClient({ vehicle: initial, suppliers, compa
   // Rate tiers: recalculate from stored monthly rate to ensure consistency
   const initMonthlyRate = vehicle.monthly_rate || 0;
   const initTiers = initMonthlyRate > 0
-    ? calcTiersFromMonthly(initMonthlyRate)
+    ? calcTiersFromMonthly(initMonthlyRate) as RateTier[]
     : (vehicle.rate_tiers && vehicle.rate_tiers.length > 0
       ? vehicle.rate_tiers.slice(0, 4)
       : DEFAULT_TIERS.map(t => ({ ...t, vehicle_id: vehicle.id })));
