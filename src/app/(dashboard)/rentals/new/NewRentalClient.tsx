@@ -109,7 +109,7 @@ export default function NewRentalClient({ vehicles, customers, guarantors, activ
   const { days, subtotal } = startDate && endDate && dailyRate > 0
     ? calculateRentalAmount(startDate, endDate, dailyRate, selectedVehicle?.rate_tiers)
     : { days: 0, subtotal: 0 };
-  const total = subtotal - (discount || 0);
+  const total = subtotal + (deposit || 0) - (discount || 0);
 
   async function handleStep1Next() {
     if (!vehicleId || !customerId || !guarantorId || !startDate || !endDate) {
@@ -459,9 +459,10 @@ export default function NewRentalClient({ vehicles, customers, guarantors, activ
             {/* Total calculation */}
             <div className="bg-blue-50 border border-blue-100 rounded-xl p-4 space-y-1.5 text-sm">
               <div className="flex justify-between"><span className="text-gray-600">Subtotal ({days}d × {formatCurrency(dailyRate)})</span><span>{formatCurrency(subtotal)}</span></div>
-              {Number(discount) > 0 && <div className="flex justify-between"><span className="text-gray-600">Discount</span><span className="text-green-600">{formatCurrency(Number(discount))}</span></div>}
+              {Number(discount) > 0 && <div className="flex justify-between"><span className="text-gray-600">Discount</span><span className="text-green-600">−{formatCurrency(Number(discount))}</span></div>}
+              <div className="flex justify-between"><span className="text-gray-600">Refundable Deposit</span><span>+ {formatCurrency(deposit || 0)}</span></div>
+              {status === "booked" && Number(advancePaid) > 0 && <div className="flex justify-between"><span className="text-gray-600">Advance Paid</span><span className="text-gray-500">−{formatCurrency(Number(advancePaid))}</span></div>}
               <div className="flex justify-between font-bold text-base pt-1 border-t border-blue-200"><span>Total</span><span className="text-blue-700">{formatCurrency(total)}</span></div>
-              <div className="flex justify-between"><span className="text-gray-600">Refundable Deposit</span><span>{formatCurrency(deposit || 0)}</span></div>
             </div>
 
             {error && <p className="text-sm text-red-600">{error}</p>}
