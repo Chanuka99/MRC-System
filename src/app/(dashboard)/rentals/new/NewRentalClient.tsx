@@ -50,6 +50,7 @@ export default function NewRentalClient({ vehicles, customers, guarantors, activ
   const [deposit, setDeposit] = useState<number | "">("");
   const [additionalCharges, setAdditionalCharges] = useState<number | "">("");
   const [discount, setDiscount] = useState<number | "">("");
+  const [advancePaid, setAdvancePaid] = useState<number | "">("");
   const [notes, setNotes] = useState("");
   const [status, setStatus] = useState<"booked" | "active">("booked");
   const [pickupKm, setPickupKm] = useState<number>(0);
@@ -108,7 +109,7 @@ export default function NewRentalClient({ vehicles, customers, guarantors, activ
   const { days, subtotal } = startDate && endDate && dailyRate > 0
     ? calculateRentalAmount(startDate, endDate, dailyRate, selectedVehicle?.rate_tiers)
     : { days: 0, subtotal: 0 };
-  const total = subtotal - (status === "booked" ? (discount || 0) : 0);
+  const total = subtotal - (discount || 0);
 
   async function handleStep1Next() {
     if (!vehicleId || !customerId || !guarantorId || !startDate || !endDate) {
@@ -155,7 +156,8 @@ export default function NewRentalClient({ vehicles, customers, guarantors, activ
         daily_rate: dailyRate,
         deposit: deposit || 0,
         extra_day_rate: additionalCharges || 0,
-        discount: status === "booked" ? (discount || 0) : 0,
+        discount: discount || 0,
+        advance_paid: status === "booked" ? (advancePaid || 0) : 0,
         pickup_km: pickupKm,
         km_limit: kmLimit,
         extra_km_rate: extraKmRate,
@@ -413,10 +415,14 @@ export default function NewRentalClient({ vehicles, customers, guarantors, activ
                   </div>
                 )}
               </div>
+              <div>
+                <label className="form-label">Discount (LKR)</label>
+                <input type="number" className="form-input" value={discount} onChange={e => setDiscount(e.target.value === "" ? "" : +e.target.value)} />
+              </div>
               {status === "booked" && (
                 <div>
-                  <label className="form-label">Discount (LKR)</label>
-                  <input type="number" className="form-input" value={discount} onChange={e => setDiscount(e.target.value === "" ? "" : +e.target.value)} />
+                  <label className="form-label">Advance Paid (LKR)</label>
+                  <input type="number" className="form-input" value={advancePaid} onChange={e => setAdvancePaid(e.target.value === "" ? "" : +e.target.value)} />
                 </div>
               )}
               <div>
