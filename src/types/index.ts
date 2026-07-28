@@ -137,6 +137,8 @@ export interface Vehicle {
   monthly_cost?: number;
   payment_frequency?: string;
   payment_days?: string;
+  supplier_km_limit?: number;
+  supplier_extra_km_rate?: number;
   is_active: boolean;
   photos?: VehiclePhoto[];
   rate_tiers?: RateTier[];
@@ -160,6 +162,8 @@ export interface RateTier {
   days_to?: number;
   rate_per_day: number;
   label?: string;
+  km_limit?: number;
+  extra_km_rate?: number;
 }
 
 export interface Customer extends AddressParts {

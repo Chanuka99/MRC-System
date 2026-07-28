@@ -12,7 +12,7 @@ import {
 } from "@/lib/vehicleData";
 import FileUploader from "@/components/shared/FileUploader";
 
-type Tier = { label: string; days_from: number; days_to: number | null; rate_per_day: number };
+type Tier = { label: string; days_from: number; days_to: number | null; rate_per_day: number; km_limit: number; extra_km_rate: number };
 
 export default function NewVehicleClient({ suppliers, companies }: { suppliers: Supplier[]; companies: Company[] }) {
   const router = useRouter();
@@ -523,38 +523,36 @@ export default function NewVehicleClient({ suppliers, companies }: { suppliers: 
             <p className="text-xs text-gray-400 pb-2">Auto-calculates all 4 tiers below</p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 gap-3">
             {tiers.map((tier, i) => (
-              <div key={i} className="flex items-center gap-3 bg-gray-50 rounded-xl px-4 py-3">
-                <div className="flex-1">
-                  <p className="text-xs font-semibold text-gray-500 mb-0.5">{tier.label}</p>
-                  {TIER_LABELS[i] !== tier.label && (
+              <div key={i} className="bg-gray-50 rounded-xl px-4 py-3">
+                <div className="flex items-center gap-3 mb-2">
+                  <div className="flex-1">
+                    <p className="text-xs font-semibold text-gray-500 mb-0.5">{tier.label}</p>
                     <p className="text-xs text-gray-400">{tier.days_from}–{tier.days_to ?? '+'} days</p>
+                  </div>
+                  {editingTier === i ? (
+                    <div className="flex items-center gap-2">
+                      <input type="number" value={tier.rate_per_day} onChange={e => handleTierEdit(i, +e.target.value)} className="form-input w-24 text-sm" autoFocus />
+                      <button type="button" onClick={() => setEditingTier(null)} className="text-green-600"><Check className="w-4 h-4" /></button>
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm font-bold text-gray-900">LKR {tier.rate_per_day.toLocaleString()}/day</span>
+                      <button type="button" onClick={() => setEditingTier(i)} className="text-gray-400 hover:text-blue-500"><Pencil className="w-3.5 h-3.5" /></button>
+                    </div>
                   )}
                 </div>
-                {editingTier === i ? (
-                  <div className="flex items-center gap-2">
-                    <input
-                      type="number"
-                      value={tier.rate_per_day}
-                      onChange={e => handleTierEdit(i, +e.target.value)}
-                      className="form-input w-24 text-sm"
-                      autoFocus
-                    />
-                    <button type="button" onClick={() => setEditingTier(null)} className="text-green-600">
-                      <Check className="w-4 h-4" />
-                    </button>
+                <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-1">
+                    <label className="text-[10px] text-gray-400">KM Limit</label>
+                    <input type="number" className="form-input w-20 text-xs py-1" value={tier.km_limit} onChange={e => setTiers(prev => prev.map((t, j) => j === i ? { ...t, km_limit: +e.target.value || 0 } : t))} />
                   </div>
-                ) : (
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm font-bold text-gray-900">
-                      LKR {tier.rate_per_day.toLocaleString()}/day
-                    </span>
-                    <button type="button" onClick={() => setEditingTier(i)} className="text-gray-400 hover:text-blue-500">
-                      <Pencil className="w-3.5 h-3.5" />
-                    </button>
+                  <div className="flex items-center gap-1">
+                    <label className="text-[10px] text-gray-400">Extra KM (LKR)</label>
+                    <input type="number" className="form-input w-20 text-xs py-1" value={tier.extra_km_rate} onChange={e => setTiers(prev => prev.map((t, j) => j === i ? { ...t, extra_km_rate: +e.target.value || 0 } : t))} />
                   </div>
-                )}
+                </div>
               </div>
             ))}
           </div>

@@ -56,10 +56,10 @@ export const VEHICLE_TYPES = ["Sedan","Hatchback","SUV","Van","Pickup","Bus","Ot
 export function calcTiersFromMonthly(monthly: number) {
   const base = monthly / 30;
   return [
-    { label: "1 Week",  days_from: 1,  days_to: 7,    rate_per_day: Math.round(base + 2000) },
-    { label: "2 Weeks", days_from: 8,  days_to: 14,   rate_per_day: Math.round(base + 1500) },
-    { label: "3 Weeks", days_from: 15, days_to: 21,   rate_per_day: Math.round(base + 1000) },
-    { label: "1 Month", days_from: 22, days_to: 30, rate_per_day: Math.round(base) },
+    { label: "1 Week",  days_from: 1,  days_to: 7,    rate_per_day: Math.round(base + 2000), km_limit: 0, extra_km_rate: 0 },
+    { label: "2 Weeks", days_from: 8,  days_to: 14,   rate_per_day: Math.round(base + 1500), km_limit: 0, extra_km_rate: 0 },
+    { label: "3 Weeks", days_from: 15, days_to: 21,   rate_per_day: Math.round(base + 1000), km_limit: 0, extra_km_rate: 0 },
+    { label: "1 Month", days_from: 22, days_to: 30, rate_per_day: Math.round(base), km_limit: 0, extra_km_rate: 0 },
   ];
 }
 

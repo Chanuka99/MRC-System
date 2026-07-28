@@ -6,7 +6,7 @@ import { supabaseAdmin } from '@/lib/supabase';
 import { requireAuth } from '@/lib/auth';
 import { deleteOldStorageFile, uploadAsset } from '@/app/actions/upload';
 import { logActivity, logActivities } from '@/app/actions/activity';
-import { Rental } from '@/types';
+import { Rental, RateTier } from '@/types';
 import { DASHBOARD_TAG, VEHICLES_TAG, RENTALS_TAG } from '@/lib/cache-tags';
 
 const SIGNED_AGREEMENTS_BUCKET = 'signed-agreements';
@@ -285,6 +285,31 @@ export async function createRental(data: {
   if (overlaps) return { error: 'Vehicle is already booked for the selected dates.' };
 
   if (!data.guarantor_id) return { error: 'Guarantor is required.' };
+
+  // Auto-populate km_limit and extra_km_rate from vehicle's rate tier if not provided
+  const kmLimit = data.km_limit ?? 0;
+  const extraKmRate = data.extra_km_rate ?? 0;
+  if (!kmLimit || !extraKmRate) {
+    const vehicleId = data.vehicle_id;
+    const { data: vehicle } = await supabaseAdmin
+      .from('vehicles')
+      .select('rate_tiers:rate_tiers(*)')
+      .eq('id', vehicleId)
+      .single();
+    const tiers = (vehicle?.rate_tiers as RateTier[]) ?? [];
+    if (tiers.length > 0) {
+      const rentalDays = daysBetween(data.start_date, data.end_date);
+      const sorted = [...tiers].sort((a, b) => a.days_from - b.days_from);
+      let matchedTier: typeof sorted[number] | null = null;
+      for (const tier of sorted) {
+        if (rentalDays >= tier.days_from) matchedTier = tier;
+      }
+      if (matchedTier) {
+        data.km_limit = data.km_limit ?? matchedTier.km_limit ?? 0;
+        data.extra_km_rate = data.extra_km_rate ?? matchedTier.extra_km_rate ?? 0;
+      }
+    }
+  }
 
   const rateType = data.rate_type ?? 'daily';
   const appliedRate = Number(data.applied_rate ?? data.daily_rate ?? 0);

@@ -45,15 +45,30 @@ export default function NewRentalClient({ vehicles, customers, guarantors, activ
   const [status, setStatus] = useState<"booked" | "active">("booked");
   const [pickupKm, setPickupKm] = useState<number>(0);
   const [editingRate, setEditingRate] = useState(false);
+  const [kmLimit, setKmLimit] = useState<number>(0);
+  const [extraKmRate, setExtraKmRate] = useState<number>(0);
+  const [editingKm, setEditingKm] = useState(false);
 
   const selectedVehicle = vehicles.find(v => v.id === vehicleId);
   const selectedCustomer = customers.find(c => c.id === customerId);
 
-  // Auto-calculate rate when vehicle and dates change
+  // Auto-calculate rate and km policy when vehicle and dates change
   useEffect(() => {
     if (selectedVehicle && startDate && endDate) {
-      const { rateUsed } = calculateRentalAmount(startDate, endDate, selectedVehicle.daily_rate, selectedVehicle.rate_tiers);
+      const { days, rateUsed } = calculateRentalAmount(startDate, endDate, selectedVehicle.daily_rate, selectedVehicle.rate_tiers);
       setDailyRate(rateUsed);
+      const tiers = selectedVehicle.rate_tiers ?? [];
+      if (tiers.length > 0) {
+        const sortedTiers = [...tiers].sort((a, b) => a.days_from - b.days_from);
+        let bestTier: typeof sortedTiers[number] | null = null;
+        for (const tier of sortedTiers) {
+          if (days >= tier.days_from) bestTier = tier;
+        }
+        if (bestTier) {
+          setKmLimit(bestTier.km_limit ?? 0);
+          setExtraKmRate(bestTier.extra_km_rate ?? 0);
+        }
+      }
     }
   }, [selectedVehicle, startDate, endDate]);
 
@@ -137,6 +152,8 @@ export default function NewRentalClient({ vehicles, customers, guarantors, activ
         additional_charges: additionalCharges,
         discount,
         pickup_km: pickupKm,
+        km_limit: kmLimit,
+        extra_km_rate: extraKmRate,
         notes,
         status,
       });
@@ -308,6 +325,27 @@ export default function NewRentalClient({ vehicles, customers, guarantors, activ
                   </div>
                 )}
                 {selectedVehicle && <p className="text-xs text-gray-400 mt-1">Vehicle default: {formatCurrency(selectedVehicle.daily_rate)}</p>}
+              </div>
+              <div>
+                <label className="form-label">KM Policy (Limit / Extra Rate)</label>
+                {editingKm ? (
+                  <div className="flex items-center gap-2">
+                    <input type="number" className="form-input w-24" value={kmLimit} onChange={e => setKmLimit(+e.target.value || 0)} placeholder="Limit" autoFocus />
+                    <span className="text-gray-400 text-sm">km free /</span>
+                    <input type="number" className="form-input w-28" value={extraKmRate} onChange={e => setExtraKmRate(+e.target.value || 0)} placeholder="Rate" />
+                    <span className="text-gray-400 text-sm">LKR/km</span>
+                    <button type="button" className="p-2 text-gray-400 hover:text-green-600" onClick={() => setEditingKm(false)} title="Confirm">
+                      <CheckCircle className="w-4 h-4" />
+                    </button>
+                  </div>
+                ) : (
+                  <div className="form-input flex items-center justify-between cursor-default bg-gray-50 text-gray-700">
+                    <span>{kmLimit > 0 ? `${kmLimit.toLocaleString()} km free` : 'No km limit'} {extraKmRate > 0 ? `+ ${formatCurrency(extraKmRate)}/km extra` : ''}</span>
+                    <button type="button" className="p-1 text-gray-400 hover:text-blue-600" onClick={() => setEditingKm(true)} title="Edit km policy">
+                      <Pencil className="w-4 h-4" />
+                    </button>
+                  </div>
+                )}
               </div>
               <div>
                 <label className="form-label">Deposit (LKR)</label>
