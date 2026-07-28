@@ -13,7 +13,7 @@ import { DASHBOARD_TAG, VEHICLES_TAG } from '@/lib/cache-tags';
 const VEHICLE_FIELDS: Record<string, string> = {
   nickname: 'Nickname', brand: 'Brand', model: 'Model', year: 'Year', color: 'Color',
   type: 'Type', status: 'Status', current_km: 'Current KM',
-  next_service_km: 'Next Service KM', daily_rate: 'Daily Rate', notes: 'Notes',
+    next_service_km: 'Next Service KM', notes: 'Notes',
   registration_document_url: 'Registration Document', bank: 'Bank', account_number: 'Account Number', branch: 'Branch',
 };
 
@@ -27,7 +27,7 @@ async function _fetchVehicles(params?: {
 }) {
   let query = supabaseAdmin
     .from('vehicles')
-    .select('id, reg_number, brand, model, year, type, source, daily_rate, current_km, next_service_km, next_service_date, supplier_extra_km_rate, customer_extra_km_rate, monthly_rate, status, created_at, rate_tiers:rate_tiers(*)', { count: 'exact' })
+    .select('id, reg_number, brand, model, year, type, source, current_km, next_service_km, next_service_date, supplier_extra_km_rate, customer_extra_km_rate, monthly_rate, status, created_at, rate_tiers:rate_tiers(*)', { count: 'exact' })
     .eq('is_active', true)
     .order('created_at', { ascending: false });
 
@@ -181,12 +181,8 @@ export async function createVehicle(formData: FormData) {
   const tiersJson = formData.get('rate_tiers') as string;
   const tiers = tiersJson ? JSON.parse(tiersJson) : [];
 
-  // Use the lowest tier rate (Below 1 Week) as daily_rate fallback
-  const dailyRate = tiers.length > 0 ? tiers[0].rate_per_day : 0;
-
   const vehicleData = {
     ...parseVehicleFields(formData),
-    daily_rate: dailyRate,
   };
 
   const { data, error } = await supabaseAdmin
@@ -243,12 +239,11 @@ export async function updateVehicle(id: string, formData: FormData) {
 
   const vehicleData = {
     ...parseVehicleFields(formData),
-    daily_rate: tiers && tiers.length > 0 ? tiers[0].rate_per_day : 0,
   };
 
   // Fetch current record for diff before updating
   const { data: current } = await supabaseAdmin.from('vehicles')
-    .select('nickname, brand, model, year, color, type, status, current_km, next_service_km, daily_rate, notes, reg_number, registration_document_url, registration_document_path, revenue_license_url, eco_test_url, insurance_url, service_tag_url')
+    .select('nickname, brand, model, year, color, type, status, current_km, next_service_km, notes, reg_number, registration_document_url, registration_document_path, revenue_license_url, eco_test_url, insurance_url, service_tag_url')
     .eq('id', id).single();
 
   // Clean up old document if changed

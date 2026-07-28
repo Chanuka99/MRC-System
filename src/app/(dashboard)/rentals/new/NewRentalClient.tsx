@@ -55,7 +55,7 @@ export default function NewRentalClient({ vehicles, customers, guarantors, activ
   // Auto-calculate rate and km policy when vehicle and dates change
   useEffect(() => {
     if (selectedVehicle && startDate && endDate) {
-      const { days, rateUsed } = calculateRentalAmount(startDate, endDate, selectedVehicle.daily_rate, selectedVehicle.rate_tiers);
+      const { days, rateUsed } = calculateRentalAmount(startDate, endDate, selectedVehicle.rate_tiers?.[0]?.rate_per_day ?? 0, selectedVehicle.rate_tiers);
       setDailyRate(rateUsed);
       const proportionalLimit = Math.round(3000 * days / 30);
       setKmLimit(proportionalLimit);
@@ -180,7 +180,7 @@ export default function NewRentalClient({ vehicles, customers, guarantors, activ
                     return (
                       <option key={v.id} value={v.id} disabled={inGarage}
                         style={inGarage ? { color: '#9ca3af' } : unavailable ? { color: '#dc2626' } : undefined}>
-                        {inGarage ? '🚫 ' : unavailable ? '⚠ ' : ''}{v.reg_number} — {v.brand} {v.model} ({formatCurrency(v.daily_rate)}/day){unavailable ? ` [${v.status}]` : ''}
+                        {inGarage ? '🚫 ' : unavailable ? '⚠ ' : ''}{v.reg_number} — {v.brand} {v.model} ({formatCurrency(v.rate_tiers?.[0]?.rate_per_day ?? 0)}/day){unavailable ? ` [${v.status}]` : ''}
                       </option>
                     );
                   })}
@@ -315,7 +315,7 @@ export default function NewRentalClient({ vehicles, customers, guarantors, activ
                     </button>
                   </div>
                 )}
-                {selectedVehicle && <p className="text-xs text-gray-400 mt-1">Vehicle default: {formatCurrency(selectedVehicle.daily_rate)}</p>}
+                {selectedVehicle && <p className="text-xs text-gray-400 mt-1">Vehicle default: {formatCurrency(selectedVehicle.rate_tiers?.[0]?.rate_per_day ?? 0)}</p>}
               </div>
               <div>
                 <label className="form-label">KM Policy (Limit / Extra Rate)</label>

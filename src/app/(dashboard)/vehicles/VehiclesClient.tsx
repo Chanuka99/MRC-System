@@ -19,7 +19,7 @@ const VehicleGridRow = memo(function VehicleGridRow({ vehicle, onClick }: { vehi
       <td>{vehicle.year ?? "—"}</td>
       <td><StatusBadge status={vehicle.type?.toLowerCase() || "unknown"} /></td>
       <td><StatusBadge status={vehicle.source?.toLowerCase() || "unknown"} /></td>
-      <td className="font-medium">{formatCurrency(vehicle.daily_rate)}</td>
+      <td className="font-medium">{formatCurrency(vehicle.rate_tiers?.[0]?.rate_per_day ?? 0)}</td>
       <td className="text-gray-500">{(vehicle.current_km || 0).toLocaleString()} km</td>
       <td>
         <ServiceAlertBadge
@@ -44,7 +44,7 @@ const VehicleMobileCard = memo(function VehicleMobileCard({ vehicle, onClick }: 
         <StatusBadge status={vehicle.status} />
       </div>
       <div className="flex flex-wrap gap-x-4 gap-y-1 text-sm text-gray-500">
-        <span>{formatCurrency(vehicle.daily_rate)}/day</span>
+        <span>{formatCurrency(vehicle.rate_tiers?.[0]?.rate_per_day ?? 0)}/day</span>
         <span>{(vehicle.current_km || 0).toLocaleString()} km</span>
         <StatusBadge status={vehicle.type?.toLowerCase() || "unknown"} />
         <StatusBadge status={vehicle.source?.toLowerCase() || "unknown"} />

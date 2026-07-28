@@ -108,7 +108,6 @@ export interface Vehicle {
   company_id?: string;
   company?: Company;
   status: VehicleStatus;
-  daily_rate: number;
   current_km: number;
   next_service_km: number;
   next_service_date?: string;

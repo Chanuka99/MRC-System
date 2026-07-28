@@ -580,7 +580,6 @@ export default function VehicleDetailClient({ vehicle: initial, suppliers, compa
     const fd = new FormData(e.currentTarget);
     fd.set("brand", editBrand);
     fd.set("model", editModel);
-    fd.set("daily_rate", rateTiers.length > 0 ? rateTiers[0].rate_per_day.toString() : "0");
     fd.set("monthly_rate", String(editMonthlyRate || "0"));
     fd.set("rate_tiers", JSON.stringify(rateTiers.map(t => ({ days_from: t.days_from, days_to: t.days_to, rate_per_day: t.rate_per_day }))));
 
@@ -1350,7 +1349,7 @@ export default function VehicleDetailClient({ vehicle: initial, suppliers, compa
               <div className="border border-blue-100 rounded-xl p-4 bg-blue-50/40">
                 <p className="text-xs text-blue-500 font-semibold mb-1">Monthly Rate</p>
                 <p className="text-2xl font-bold text-gray-900">{formatCurrency(vehicle.monthly_rate ?? 0)}<span className="text-sm font-normal text-gray-400"> / month</span></p>
-                <p className="text-xs text-gray-400 mt-1">{formatCurrency(vehicle.daily_rate)} / day</p>
+                <p className="text-xs text-gray-400 mt-1">{formatCurrency(vehicle.rate_tiers?.[0]?.rate_per_day ?? 0)} / day</p>
               </div>
 
               {((vehicle.customer_extra_km_rate ?? 0) > 0) && (
@@ -1383,7 +1382,7 @@ export default function VehicleDetailClient({ vehicle: initial, suppliers, compa
                     <span className="text-xs text-amber-600 font-semibold">Monthly Profit</span>
                     <span className="text-base font-bold text-green-700">{(() => {
                       const t4 = vehicle.rate_tiers?.find(t => t.days_from === 22);
-                      const monthly = t4 ? t4.rate_per_day * 30 : vehicle.daily_rate * 30;
+                      const monthly = t4 ? t4.rate_per_day * 30 : (vehicle.rate_tiers?.[0]?.rate_per_day ?? 0) * 30;
                       return formatCurrency(monthly - (vehicle.monthly_cost || 0));
                     })()}</span>
                   </div>
