@@ -286,20 +286,17 @@ export async function createRental(data: {
 
   if (!data.guarantor_id) return { error: 'Guarantor is required.' };
 
-  // Auto-populate km_limit and extra_km_rate from vehicle if not provided
+  // Auto-populate km_limit and extra_km_rate from vehicle if not provided (limit is fixed at 3000/month)
   if (!(data.km_limit ?? 0) || !(data.extra_km_rate ?? 0)) {
     const { data: vehicle } = await supabaseAdmin
       .from('vehicles')
-      .select('customer_km_limit, customer_extra_km_rate')
+      .select('customer_extra_km_rate')
       .eq('id', data.vehicle_id)
       .single();
-    if (vehicle) {
-      const rentalDays = daysBetween(data.start_date, data.end_date);
-      const monthlyKmLimit = (vehicle as any).customer_km_limit ?? 0;
-      const proportionalLimit = monthlyKmLimit ? Math.round(monthlyKmLimit * rentalDays / 30) : 0;
-      data.km_limit = data.km_limit ?? proportionalLimit;
-      data.extra_km_rate = data.extra_km_rate ?? ((vehicle as any).customer_extra_km_rate ?? 0);
-    }
+    const rentalDays = daysBetween(data.start_date, data.end_date);
+    const proportionalLimit = Math.round(3000 * rentalDays / 30);
+    data.km_limit = data.km_limit ?? proportionalLimit;
+    data.extra_km_rate = data.extra_km_rate ?? ((vehicle as any)?.customer_extra_km_rate ?? 0);
   }
 
   const rateType = data.rate_type ?? 'daily';

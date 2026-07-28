@@ -27,7 +27,7 @@ async function _fetchVehicles(params?: {
 }) {
   let query = supabaseAdmin
     .from('vehicles')
-    .select('id, reg_number, brand, model, year, type, source, daily_rate, current_km, next_service_km, next_service_date, supplier_km_limit, supplier_extra_km_rate, customer_km_limit, customer_extra_km_rate, status, created_at, rate_tiers:rate_tiers(*)', { count: 'exact' })
+    .select('id, reg_number, brand, model, year, type, source, daily_rate, current_km, next_service_km, next_service_date, supplier_extra_km_rate, customer_extra_km_rate, status, created_at, rate_tiers:rate_tiers(*)', { count: 'exact' })
     .eq('is_active', true)
     .order('created_at', { ascending: false });
 
@@ -118,9 +118,7 @@ function parseVehicleFields(formData: FormData) {
     monthly_cost: formData.get('monthly_cost') ? parseFloat(formData.get('monthly_cost') as string) : null,
     payment_frequency: (formData.get('payment_frequency') as string) || null,
     payment_days: (formData.get('payment_days') as string) || null,
-    supplier_km_limit: parseInt(formData.get('supplier_km_limit') as string) || 0,
     supplier_extra_km_rate: formData.get('supplier_extra_km_rate') ? parseFloat(formData.get('supplier_extra_km_rate') as string) : 0,
-    customer_km_limit: parseInt(formData.get('customer_km_limit') as string) || 0,
     customer_extra_km_rate: formData.get('customer_extra_km_rate') ? parseFloat(formData.get('customer_extra_km_rate') as string) : 0,
     notes: formData.get('notes') as string || null,
   };

@@ -137,9 +137,7 @@ export interface Vehicle {
   monthly_cost?: number;
   payment_frequency?: string;
   payment_days?: string;
-  supplier_km_limit?: number;
   supplier_extra_km_rate?: number;
-  customer_km_limit?: number;
   customer_extra_km_rate?: number;
   is_active: boolean;
   photos?: VehiclePhoto[];

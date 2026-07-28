@@ -57,8 +57,7 @@ export default function NewRentalClient({ vehicles, customers, guarantors, activ
     if (selectedVehicle && startDate && endDate) {
       const { days, rateUsed } = calculateRentalAmount(startDate, endDate, selectedVehicle.daily_rate, selectedVehicle.rate_tiers);
       setDailyRate(rateUsed);
-      const monthlyKmLimit = selectedVehicle.customer_km_limit ?? 0;
-      const proportionalLimit = monthlyKmLimit ? Math.round(monthlyKmLimit * days / 30) : 0;
+      const proportionalLimit = Math.round(3000 * days / 30);
       setKmLimit(proportionalLimit);
       setExtraKmRate(selectedVehicle.customer_extra_km_rate ?? 0);
     }

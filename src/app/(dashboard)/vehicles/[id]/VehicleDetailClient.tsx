@@ -743,12 +743,7 @@ export default function VehicleDetailClient({ vehicle: initial, suppliers, compa
                 </div>
               )}
               {editSource === "Supplier" && (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2">
-                  <div>
-                    <label className="form-label text-sm">Supplier KM Limit</label>
-                    <input name="supplier_km_limit" type="number" min="0" defaultValue={vehicle.supplier_km_limit ?? 0} className="form-input text-sm" />
-                    <p className="text-xs text-gray-400 mt-1">Free km allowed per month by supplier</p>
-                  </div>
+                <div className="mt-2">
                   <div>
                     <label className="form-label text-sm">Supplier Extra KM Rate (LKR)</label>
                     <input name="supplier_extra_km_rate" type="number" min="0" step="0.01" defaultValue={vehicle.supplier_extra_km_rate ?? 0} className="form-input text-sm" />
@@ -835,12 +830,7 @@ export default function VehicleDetailClient({ vehicle: initial, suppliers, compa
                   </div>
                   <p className="text-xs text-gray-400 pb-2">Auto-calculates tiers below</p>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
-                  <div>
-                    <label className="form-label text-sm">Customer KM Limit / Month</label>
-                    <input name="customer_km_limit" type="number" min="0" defaultValue={vehicle.customer_km_limit ?? 0} className="form-input text-sm" />
-                    <p className="text-xs text-gray-400 mt-1">Free km per month for customer</p>
-                  </div>
+                <div className="grid grid-cols-1 gap-3 mb-4">
                   <div>
                     <label className="form-label text-sm">Extra KM Charge (LKR/km)</label>
                     <input name="customer_extra_km_rate" type="number" min="0" step="0.01" defaultValue={vehicle.customer_extra_km_rate ?? 0} className="form-input text-sm" />
@@ -1342,12 +1332,11 @@ export default function VehicleDetailClient({ vehicle: initial, suppliers, compa
                 <p className="text-xs text-gray-400 mt-1">{formatCurrency(vehicle.daily_rate)} / day</p>
               </div>
 
-              {((vehicle.customer_km_limit ?? 0) > 0 || (vehicle.customer_extra_km_rate ?? 0) > 0) && (
+              {((vehicle.customer_extra_km_rate ?? 0) > 0) && (
                 <div className="border border-green-100 rounded-xl p-4 bg-green-50/40">
                   <p className="text-xs text-green-600 font-semibold mb-1">Extra KM Charge (Customer)</p>
                   <div className="flex items-center gap-4 text-sm text-gray-700">
-                    {(vehicle.customer_km_limit ?? 0) > 0 && <span>Free: <strong>{vehicle.customer_km_limit?.toLocaleString()} km/month</strong></span>}
-                    {(vehicle.customer_extra_km_rate ?? 0) > 0 && <span>Charge: <strong>{formatCurrency(vehicle.customer_extra_km_rate!)}/km</strong></span>}
+                    <span>Charge: <strong>{formatCurrency(vehicle.customer_extra_km_rate!)}/km</strong></span>
                   </div>
                   {(vehicle.customer_extra_km_rate ?? 0) > 0 && (vehicle.supplier_extra_km_rate ?? 0) > 0 && (vehicle.customer_extra_km_rate! < vehicle.supplier_extra_km_rate!) && (
                     <p className="text-xs text-red-500 mt-2">Warning: Customer extra km rate is lower than supplier rate</p>
@@ -1364,10 +1353,9 @@ export default function VehicleDetailClient({ vehicle: initial, suppliers, compa
                       {vehicle.payment_frequency === '15_days' ? 'Every 15 days' : 'Monthly'} on day{vehicle.payment_days.includes(',') ? 's' : ''} {vehicle.payment_days}
                     </p>
                   )}
-                  {((vehicle.supplier_km_limit ?? 0) > 0 || (vehicle.supplier_extra_km_rate ?? 0) > 0) && (
+                  {((vehicle.supplier_extra_km_rate ?? 0) > 0) && (
                     <div className="flex items-center gap-4 mt-2 text-xs text-gray-500">
-                      {(vehicle.supplier_km_limit ?? 0) > 0 && <span>Free KM: <strong>{vehicle.supplier_km_limit?.toLocaleString()} km/month</strong></span>}
-                      {(vehicle.supplier_extra_km_rate ?? 0) > 0 && <span>Extra KM Cost: <strong>{formatCurrency(vehicle.supplier_extra_km_rate!)}/km</strong></span>}
+                      <span>Extra KM Cost: <strong>{formatCurrency(vehicle.supplier_extra_km_rate!)}/km</strong></span>
                     </div>
                   )}
                   <div className="flex justify-between items-center mt-3 pt-3 border-t border-amber-200">

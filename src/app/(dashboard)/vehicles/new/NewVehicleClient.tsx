@@ -359,11 +359,6 @@ export default function NewVehicleClient({ suppliers, companies }: { suppliers: 
                 </p>
               </div>
               <div>
-                <label className="form-label">Supplier KM Limit / Month</label>
-                <input name="supplier_km_limit" type="number" min="0" defaultValue="0" className="form-input" />
-                <p className="text-xs text-gray-400 mt-1">Free km allowed per month by supplier</p>
-              </div>
-              <div>
                 <label className="form-label">Supplier Extra KM Rate (LKR/km)</label>
                 <input name="supplier_extra_km_rate" type="number" min="0" step="0.01" defaultValue="0" className="form-input" />
                 <p className="text-xs text-gray-400 mt-1">Per-km rate paid to supplier for excess</p>
@@ -533,14 +528,9 @@ export default function NewVehicleClient({ suppliers, companies }: { suppliers: 
             <p className="text-xs text-gray-400 pb-2">Auto-calculates all 4 tiers below</p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-5">
+          <div className="grid grid-cols-1 gap-3 mb-5">
             <div>
-              <label className="form-label">Customer KM Limit / Month</label>
-              <input name="customer_km_limit" type="number" min="0" defaultValue="0" className="form-input text-sm" />
-              <p className="text-xs text-gray-400 mt-1">Free km allowed per month for customer</p>
-            </div>
-            <div>
-              <label className="form-label">Extra KM Charge (LKR/km) <span className="text-red-500">*</span></label>
+              <label className="form-label">Extra KM Charge (LKR/km)</label>
               <input name="customer_extra_km_rate" type="number" min="0" step="0.01" defaultValue="0" className="form-input text-sm" />
               <p className="text-xs text-gray-400 mt-1">Per-km rate charged to customer for excess</p>
             </div>
