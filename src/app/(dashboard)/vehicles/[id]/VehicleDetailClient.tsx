@@ -492,16 +492,14 @@ export default function VehicleDetailClient({ vehicle: initial, suppliers, compa
   const [editFormData, setEditFormData] = useState<FormData | null>(null);
   const [docViewer, setDocViewer] = useState<{ open: boolean; url: string; title: string }>({ open: false, url: '', title: '' });
   
-  // Rate tiers: if existing tiers exist use them (up to 4), else show 4 defaults
-  const initTiers = vehicle.rate_tiers && vehicle.rate_tiers.length > 0
+  // Rate tiers: recalculate from stored monthly rate to ensure consistency
+  const initMonthlyRate = vehicle.monthly_rate
+    ?? (() => { const mt = vehicle.rate_tiers?.find(t => t.days_from === 22); return mt ? mt.rate_per_day * 30 : vehicle.daily_rate * 30; })();
+  const initTiers = vehicle.rate_tiers && vehicle.rate_tiers.length > 0 && !vehicle.monthly_rate
     ? vehicle.rate_tiers.slice(0, 4)
-    : DEFAULT_TIERS.map(t => ({ ...t, vehicle_id: vehicle.id }));
+    : (initMonthlyRate > 0 ? calcTiersFromMonthly(initMonthlyRate) : DEFAULT_TIERS.map(t => ({ ...t, vehicle_id: vehicle.id })));
   const [rateTiers, setRateTiers] = useState(initTiers);
-  const [editMonthlyRate, setEditMonthlyRate] = useState<number | string>(() => {
-    if (vehicle.monthly_rate) return vehicle.monthly_rate;
-    const monthTier = vehicle.rate_tiers?.find(t => t.days_from === 22);
-    return monthTier ? monthTier.rate_per_day * 30 : vehicle.daily_rate * 30 || "";
-  });
+  const [editMonthlyRate, setEditMonthlyRate] = useState<number | string>(initMonthlyRate || "");
 
   useEffect(() => {
     setVehicle(initial);
