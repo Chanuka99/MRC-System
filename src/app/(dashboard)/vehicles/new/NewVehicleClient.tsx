@@ -164,6 +164,15 @@ export default function NewVehicleClient({ suppliers, companies }: { suppliers: 
       }
     }
 
+    if (source === "Supplier") {
+      const monthlyCost = parseFloat(fd.get('monthly_cost') as string) || 0;
+      const monthlyRateVal = parseInt(monthlyRate as string) || 0;
+      if (monthlyCost && monthlyRateVal && monthlyRateVal <= monthlyCost) {
+        setError("Monthly Rate (LKR) must be greater than Supplier Payment (Rs.).");
+        return;
+      }
+    }
+
     // Override brand/model from state (controlled)
     fd.set("brand", brand);
     fd.set("model", model);

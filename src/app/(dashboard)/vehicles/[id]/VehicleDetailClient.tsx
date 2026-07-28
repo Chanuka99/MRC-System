@@ -600,6 +600,15 @@ export default function VehicleDetailClient({ vehicle: initial, suppliers, compa
       }
     }
 
+    if (editSource === "Supplier") {
+      const monthlyCost = parseFloat(fd.get('monthly_cost') as string) || 0;
+      const monthlyRateVal = parseInt(editMonthlyRate as string) || 0;
+      if (monthlyCost && monthlyRateVal && monthlyRateVal <= monthlyCost) {
+        setError("Monthly Rate (LKR) must be greater than Supplier Payment (Rs.).");
+        return;
+      }
+    }
+
     setEditFormData(fd);
     setError(null);
     setConfirmEdit(true);
