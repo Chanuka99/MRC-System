@@ -493,11 +493,12 @@ export default function VehicleDetailClient({ vehicle: initial, suppliers, compa
   const [docViewer, setDocViewer] = useState<{ open: boolean; url: string; title: string }>({ open: false, url: '', title: '' });
   
   // Rate tiers: recalculate from stored monthly rate to ensure consistency
-  const initMonthlyRate = vehicle.monthly_rate
-    ?? (() => { const mt = vehicle.rate_tiers?.find(t => t.days_from === 22); return mt ? mt.rate_per_day * 30 : vehicle.daily_rate * 30; })();
-  const initTiers = vehicle.rate_tiers && vehicle.rate_tiers.length > 0 && !vehicle.monthly_rate
-    ? vehicle.rate_tiers.slice(0, 4)
-    : (initMonthlyRate > 0 ? calcTiersFromMonthly(initMonthlyRate) : DEFAULT_TIERS.map(t => ({ ...t, vehicle_id: vehicle.id })));
+  const initMonthlyRate = vehicle.monthly_rate || 0;
+  const initTiers = initMonthlyRate > 0
+    ? calcTiersFromMonthly(initMonthlyRate)
+    : (vehicle.rate_tiers && vehicle.rate_tiers.length > 0
+      ? vehicle.rate_tiers.slice(0, 4)
+      : DEFAULT_TIERS.map(t => ({ ...t, vehicle_id: vehicle.id })));
   const [rateTiers, setRateTiers] = useState(initTiers);
   const [editMonthlyRate, setEditMonthlyRate] = useState<number | string>(initMonthlyRate || "");
 
@@ -935,7 +936,7 @@ export default function VehicleDetailClient({ vehicle: initial, suppliers, compa
                   { label: "Agreement Start Date", value: formatDate(vehicle.agreement_start_date) },
                   { label: "Agreement Period", value: vehicle.agreement_period ? `${vehicle.agreement_period} Months` : "—" },
                   { label: "Renew Date", value: formatDate(vehicle.renew_date) },
-                  { label: "Monthly Rate", value: formatCurrency(vehicle.monthly_rate ?? (() => { const t4 = vehicle.rate_tiers?.find(t => t.days_from === 22); return t4 ? t4.rate_per_day * 30 : vehicle.daily_rate * 30; })()) },
+                  { label: "Monthly Rate", value: (vehicle.monthly_rate ?? 0) > 0 ? formatCurrency(vehicle.monthly_rate!) : "—" },
                   ...(vehicle.source === "Supplier" && (vehicle.supplier_extra_km_rate ?? 0) > 0 ? [
                     { label: "Supplier Extra KM", value: <span>{formatCurrency(vehicle.supplier_extra_km_rate!)}/km</span> }
                   ] : []),
@@ -1348,10 +1349,7 @@ export default function VehicleDetailClient({ vehicle: initial, suppliers, compa
 
               <div className="border border-blue-100 rounded-xl p-4 bg-blue-50/40">
                 <p className="text-xs text-blue-500 font-semibold mb-1">Monthly Rate</p>
-                <p className="text-2xl font-bold text-gray-900">{formatCurrency(vehicle.monthly_rate ?? (() => {
-                  const tier4 = vehicle.rate_tiers?.find(t => t.days_from === 22);
-                  return tier4 ? tier4.rate_per_day * 30 : vehicle.daily_rate * 30;
-                })())}<span className="text-sm font-normal text-gray-400"> / month</span></p>
+                <p className="text-2xl font-bold text-gray-900">{formatCurrency(vehicle.monthly_rate ?? 0)}<span className="text-sm font-normal text-gray-400"> / month</span></p>
                 <p className="text-xs text-gray-400 mt-1">{formatCurrency(vehicle.daily_rate)} / day</p>
               </div>
 
