@@ -933,6 +933,9 @@ export default function VehicleDetailClient({ vehicle: initial, suppliers, compa
                   { label: "Agreement Period", value: vehicle.agreement_period ? `${vehicle.agreement_period} Months` : "—" },
                   { label: "Renew Date", value: formatDate(vehicle.renew_date) },
                   { label: "Monthly Rate", value: (() => { const t4 = vehicle.rate_tiers?.find(t => t.days_from === 22); return formatCurrency(t4 ? t4.rate_per_day * 30 : vehicle.daily_rate * 30); })() },
+                  ...(vehicle.source === "Supplier" && (vehicle.supplier_extra_km_rate ?? 0) > 0 ? [
+                    { label: "Supplier Extra KM", value: <span>{formatCurrency(vehicle.supplier_extra_km_rate!)}/km</span> }
+                  ] : []),
                   { label: "Next Service KM", value: (vehicle.next_service_km || 0).toLocaleString() + " km" },
                 ].map(f => (
                   <div key={f.label}>
