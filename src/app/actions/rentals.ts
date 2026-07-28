@@ -6,7 +6,7 @@ import { supabaseAdmin } from '@/lib/supabase';
 import { requireAuth } from '@/lib/auth';
 import { deleteOldStorageFile, uploadAsset } from '@/app/actions/upload';
 import { logActivity, logActivities } from '@/app/actions/activity';
-import { Rental, RateTier } from '@/types';
+import { Rental } from '@/types';
 import { DASHBOARD_TAG, VEHICLES_TAG, RENTALS_TAG } from '@/lib/cache-tags';
 
 const SIGNED_AGREEMENTS_BUCKET = 'signed-agreements';
@@ -286,28 +286,19 @@ export async function createRental(data: {
 
   if (!data.guarantor_id) return { error: 'Guarantor is required.' };
 
-  // Auto-populate km_limit and extra_km_rate from vehicle's rate tier if not provided
-  const kmLimit = data.km_limit ?? 0;
-  const extraKmRate = data.extra_km_rate ?? 0;
-  if (!kmLimit || !extraKmRate) {
-    const vehicleId = data.vehicle_id;
+  // Auto-populate km_limit and extra_km_rate from vehicle if not provided
+  if (!(data.km_limit ?? 0) || !(data.extra_km_rate ?? 0)) {
     const { data: vehicle } = await supabaseAdmin
       .from('vehicles')
-      .select('rate_tiers:rate_tiers(*)')
-      .eq('id', vehicleId)
+      .select('customer_km_limit, customer_extra_km_rate')
+      .eq('id', data.vehicle_id)
       .single();
-    const tiers = (vehicle?.rate_tiers as RateTier[]) ?? [];
-    if (tiers.length > 0) {
+    if (vehicle) {
       const rentalDays = daysBetween(data.start_date, data.end_date);
-      const sorted = [...tiers].sort((a, b) => a.days_from - b.days_from);
-      let matchedTier: typeof sorted[number] | null = null;
-      for (const tier of sorted) {
-        if (rentalDays >= tier.days_from) matchedTier = tier;
-      }
-      if (matchedTier) {
-        data.km_limit = data.km_limit ?? matchedTier.km_limit ?? 0;
-        data.extra_km_rate = data.extra_km_rate ?? matchedTier.extra_km_rate ?? 0;
-      }
+      const monthlyKmLimit = (vehicle as any).customer_km_limit ?? 0;
+      const proportionalLimit = monthlyKmLimit ? Math.round(monthlyKmLimit * rentalDays / 30) : 0;
+      data.km_limit = data.km_limit ?? proportionalLimit;
+      data.extra_km_rate = data.extra_km_rate ?? ((vehicle as any).customer_extra_km_rate ?? 0);
     }
   }
 

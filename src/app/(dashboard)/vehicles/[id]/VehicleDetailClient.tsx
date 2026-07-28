@@ -578,7 +578,7 @@ export default function VehicleDetailClient({ vehicle: initial, suppliers, compa
     fd.set("brand", editBrand);
     fd.set("model", editModel);
     fd.set("daily_rate", rateTiers.length > 0 ? rateTiers[0].rate_per_day.toString() : "0");
-    fd.set("rate_tiers", JSON.stringify(rateTiers.map(t => ({ days_from: t.days_from, days_to: t.days_to, rate_per_day: t.rate_per_day, km_limit: t.km_limit, extra_km_rate: t.extra_km_rate }))));
+    fd.set("rate_tiers", JSON.stringify(rateTiers.map(t => ({ days_from: t.days_from, days_to: t.days_to, rate_per_day: t.rate_per_day }))));
     setEditFormData(fd);
     setError(null);
     setConfirmEdit(true);
@@ -835,44 +835,36 @@ export default function VehicleDetailClient({ vehicle: initial, suppliers, compa
                   </div>
                   <p className="text-xs text-gray-400 pb-2">Auto-calculates tiers below</p>
                 </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
+                  <div>
+                    <label className="form-label text-sm">Customer KM Limit / Month</label>
+                    <input name="customer_km_limit" type="number" min="0" defaultValue={vehicle.customer_km_limit ?? 0} className="form-input text-sm" />
+                    <p className="text-xs text-gray-400 mt-1">Free km per month for customer</p>
+                  </div>
+                  <div>
+                    <label className="form-label text-sm">Extra KM Charge (LKR/km)</label>
+                    <input name="customer_extra_km_rate" type="number" min="0" step="0.01" defaultValue={vehicle.customer_extra_km_rate ?? 0} className="form-input text-sm" />
+                    <p className="text-xs text-gray-400 mt-1">Per-km rate charged to customer</p>
+                  </div>
+                </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                   {rateTiers.map((tier, i) => (
-                    <div key={i} className="bg-white rounded-lg border border-gray-200 px-4 py-3 space-y-2">
-                      <div className="flex items-center gap-3">
-                        <div className="flex-1">
-                          <p className="text-xs font-semibold text-gray-500 mb-0.5">{TIER_LABELS[i] || `Tier ${i + 1}`}</p>
-                          <p className="text-xs text-gray-400">{tier.days_from}–{tier.days_to ?? '∞'} days</p>
-                        </div>
-                        <input
-                          type="number"
-                          value={tier.rate_per_day}
-                          onChange={e => {
-                            const newTiers = [...rateTiers];
-                            newTiers[i] = { ...newTiers[i], rate_per_day: +e.target.value };
-                            setRateTiers(newTiers);
-                          }}
-                          className="form-input w-28 text-sm"
-                        />
-                        <span className="text-sm text-gray-400">/day</span>
+                    <div key={i} className="flex items-center gap-3 bg-white rounded-lg border border-gray-200 px-4 py-3">
+                      <div className="flex-1">
+                        <p className="text-xs font-semibold text-gray-500 mb-0.5">{TIER_LABELS[i] || `Tier ${i + 1}`}</p>
+                        <p className="text-xs text-gray-400">{tier.days_from}–{tier.days_to ?? '∞'} days</p>
                       </div>
-                      <div className="flex items-center gap-3">
-                        <div className="flex items-center gap-1">
-                          <label className="text-[10px] text-gray-400">KM Limit</label>
-                          <input type="number" min="0" value={tier.km_limit ?? 0} onChange={e => {
-                            const newTiers = [...rateTiers];
-                            newTiers[i] = { ...newTiers[i], km_limit: +e.target.value || 0 };
-                            setRateTiers(newTiers);
-                          }} className="form-input w-20 text-xs py-1" />
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <label className="text-[10px] text-gray-400">Extra KM (LKR)</label>
-                          <input type="number" min="0" step="0.01" value={tier.extra_km_rate ?? 0} onChange={e => {
-                            const newTiers = [...rateTiers];
-                            newTiers[i] = { ...newTiers[i], extra_km_rate: +e.target.value || 0 };
-                            setRateTiers(newTiers);
-                          }} className="form-input w-20 text-xs py-1" />
-                        </div>
-                      </div>
+                      <input
+                        type="number"
+                        value={tier.rate_per_day}
+                        onChange={e => {
+                          const newTiers = [...rateTiers];
+                          newTiers[i] = { ...newTiers[i], rate_per_day: +e.target.value };
+                          setRateTiers(newTiers);
+                        }}
+                        className="form-input w-28 text-sm"
+                      />
+                      <span className="text-sm text-gray-400">/day</span>
                     </div>
                   ))}
                 </div>
@@ -1323,25 +1315,17 @@ export default function VehicleDetailClient({ vehicle: initial, suppliers, compa
                 ) : (
                   <div className="space-y-2">
                     {vehicle.rate_tiers?.map((tier, i) => (
-                      <div key={i} className="bg-gray-50 rounded-xl px-5 py-4">
-                        <div className="flex items-center justify-between mb-2">
-                          <div>
-                            <p className="text-xs text-gray-500 mb-0.5">{TIER_LABELS[i] || 'Duration'}</p>
-                            <p className="text-sm font-semibold text-gray-900">
-                              {tier.days_from} — {tier.days_to ?? "∞"} days
-                            </p>
-                          </div>
-                          <div className="text-right">
-                            <p className="text-xs text-gray-500 mb-0.5">Rate per day</p>
-                            <p className="text-lg font-bold text-blue-600">{formatCurrency(tier.rate_per_day)}</p>
-                          </div>
+                      <div key={i} className="flex items-center justify-between bg-gray-50 rounded-xl px-5 py-4">
+                        <div>
+                          <p className="text-xs text-gray-500 mb-0.5">{TIER_LABELS[i] || 'Duration'}</p>
+                          <p className="text-sm font-semibold text-gray-900">
+                            {tier.days_from} — {tier.days_to ?? "∞"} days
+                          </p>
                         </div>
-                        {(tier.km_limit || tier.extra_km_rate) ? (
-                          <div className="flex items-center gap-4 text-xs text-gray-500">
-                            {tier.km_limit ? <span>KM Limit: <strong>{tier.km_limit.toLocaleString()} km</strong></span> : null}
-                            {tier.extra_km_rate ? <span>Extra KM: <strong>{formatCurrency(tier.extra_km_rate)}/km</strong></span> : null}
-                          </div>
-                        ) : null}
+                        <div className="text-right">
+                          <p className="text-xs text-gray-500 mb-0.5">Rate per day</p>
+                          <p className="text-lg font-bold text-blue-600">{formatCurrency(tier.rate_per_day)}</p>
+                        </div>
                       </div>
                     ))}
                   </div>
@@ -1358,6 +1342,19 @@ export default function VehicleDetailClient({ vehicle: initial, suppliers, compa
                 <p className="text-xs text-gray-400 mt-1">{formatCurrency(vehicle.daily_rate)} / day</p>
               </div>
 
+              {((vehicle.customer_km_limit ?? 0) > 0 || (vehicle.customer_extra_km_rate ?? 0) > 0) && (
+                <div className="border border-green-100 rounded-xl p-4 bg-green-50/40">
+                  <p className="text-xs text-green-600 font-semibold mb-1">Extra KM Charge (Customer)</p>
+                  <div className="flex items-center gap-4 text-sm text-gray-700">
+                    {(vehicle.customer_km_limit ?? 0) > 0 && <span>Free: <strong>{vehicle.customer_km_limit?.toLocaleString()} km/month</strong></span>}
+                    {(vehicle.customer_extra_km_rate ?? 0) > 0 && <span>Charge: <strong>{formatCurrency(vehicle.customer_extra_km_rate!)}/km</strong></span>}
+                  </div>
+                  {(vehicle.customer_extra_km_rate ?? 0) > 0 && (vehicle.supplier_extra_km_rate ?? 0) > 0 && (vehicle.customer_extra_km_rate! < vehicle.supplier_extra_km_rate!) && (
+                    <p className="text-xs text-red-500 mt-2">Warning: Customer extra km rate is lower than supplier rate</p>
+                  )}
+                </div>
+              )}
+
               {vehicle.source === "Supplier" && vehicle.monthly_cost && (
                 <div className="border border-amber-100 rounded-xl p-4 bg-amber-50/40">
                   <p className="text-xs text-amber-600 font-semibold mb-1">Supplier Payment</p>
@@ -1367,12 +1364,12 @@ export default function VehicleDetailClient({ vehicle: initial, suppliers, compa
                       {vehicle.payment_frequency === '15_days' ? 'Every 15 days' : 'Monthly'} on day{vehicle.payment_days.includes(',') ? 's' : ''} {vehicle.payment_days}
                     </p>
                   )}
-                  {(vehicle.supplier_km_limit || vehicle.supplier_extra_km_rate) ? (
+                  {((vehicle.supplier_km_limit ?? 0) > 0 || (vehicle.supplier_extra_km_rate ?? 0) > 0) && (
                     <div className="flex items-center gap-4 mt-2 text-xs text-gray-500">
-                      {vehicle.supplier_km_limit ? <span>Free KM: <strong>{vehicle.supplier_km_limit.toLocaleString()} km/month</strong></span> : null}
-                      {vehicle.supplier_extra_km_rate ? <span>Extra KM Cost: <strong>{formatCurrency(vehicle.supplier_extra_km_rate)}/km</strong></span> : null}
+                      {(vehicle.supplier_km_limit ?? 0) > 0 && <span>Free KM: <strong>{vehicle.supplier_km_limit?.toLocaleString()} km/month</strong></span>}
+                      {(vehicle.supplier_extra_km_rate ?? 0) > 0 && <span>Extra KM Cost: <strong>{formatCurrency(vehicle.supplier_extra_km_rate!)}/km</strong></span>}
                     </div>
-                  ) : null}
+                  )}
                   <div className="flex justify-between items-center mt-3 pt-3 border-t border-amber-200">
                     <span className="text-xs text-amber-600 font-semibold">Monthly Profit</span>
                     <span className="text-base font-bold text-green-700">{(() => {

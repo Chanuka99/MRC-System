@@ -27,7 +27,7 @@ async function _fetchVehicles(params?: {
 }) {
   let query = supabaseAdmin
     .from('vehicles')
-    .select('id, reg_number, brand, model, year, type, source, daily_rate, current_km, next_service_km, next_service_date, supplier_km_limit, supplier_extra_km_rate, status, created_at, rate_tiers:rate_tiers(*)', { count: 'exact' })
+    .select('id, reg_number, brand, model, year, type, source, daily_rate, current_km, next_service_km, next_service_date, supplier_km_limit, supplier_extra_km_rate, customer_km_limit, customer_extra_km_rate, status, created_at, rate_tiers:rate_tiers(*)', { count: 'exact' })
     .eq('is_active', true)
     .order('created_at', { ascending: false });
 
@@ -120,6 +120,8 @@ function parseVehicleFields(formData: FormData) {
     payment_days: (formData.get('payment_days') as string) || null,
     supplier_km_limit: parseInt(formData.get('supplier_km_limit') as string) || 0,
     supplier_extra_km_rate: formData.get('supplier_extra_km_rate') ? parseFloat(formData.get('supplier_extra_km_rate') as string) : 0,
+    customer_km_limit: parseInt(formData.get('customer_km_limit') as string) || 0,
+    customer_extra_km_rate: formData.get('customer_extra_km_rate') ? parseFloat(formData.get('customer_extra_km_rate') as string) : 0,
     notes: formData.get('notes') as string || null,
   };
 }
@@ -199,13 +201,11 @@ export async function createVehicle(formData: FormData) {
   // Insert rate tiers
   if (tiers.length > 0) {
     await supabaseAdmin.from('rate_tiers').insert(
-      tiers.map((t: { days_from: number; days_to?: number | null; rate_per_day: number; label?: string; km_limit?: number; extra_km_rate?: number }) => ({
+      tiers.map((t: { days_from: number; days_to?: number | null; rate_per_day: number; label?: string }) => ({
         vehicle_id: data.id,
         days_from: t.days_from,
         days_to: t.days_to ?? null,
         rate_per_day: t.rate_per_day,
-        km_limit: t.km_limit ?? 0,
-        extra_km_rate: t.extra_km_rate ?? 0,
       }))
     );
   }
@@ -274,13 +274,11 @@ export async function updateVehicle(id: string, formData: FormData) {
     await supabaseAdmin.from('rate_tiers').delete().eq('vehicle_id', id);
     if (tiers.length > 0) {
       await supabaseAdmin.from('rate_tiers').insert(
-        tiers.map((t: { days_from: number; days_to?: number | null; rate_per_day: number; km_limit?: number; extra_km_rate?: number }) => ({
+        tiers.map((t: { days_from: number; days_to?: number | null; rate_per_day: number }) => ({
           vehicle_id: id,
           days_from: t.days_from,
           days_to: t.days_to ?? null,
           rate_per_day: t.rate_per_day,
-          km_limit: t.km_limit ?? 0,
-          extra_km_rate: t.extra_km_rate ?? 0,
         }))
       );
     }
