@@ -77,13 +77,15 @@ export function calculateRentalAmount(
   let rateUsed = dailyRate;
   
   if (rateTiers && rateTiers.length > 0) {
-    // Find applicable tier
     const sortedTiers = [...rateTiers].sort((a, b) => a.days_from - b.days_from);
+    let bestTier: typeof sortedTiers[number] | null = null;
     for (const tier of sortedTiers) {
-      if (days >= tier.days_from && (tier.days_to === null || tier.days_to === undefined || days <= tier.days_to)) {
-        rateUsed = tier.rate_per_day;
-        break;
+      if (days >= tier.days_from) {
+        bestTier = tier;
       }
+    }
+    if (bestTier) {
+      rateUsed = bestTier.rate_per_day;
     }
   }
   
