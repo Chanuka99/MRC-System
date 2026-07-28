@@ -38,9 +38,9 @@ export default function NewRentalClient({ vehicles, customers, guarantors, activ
 
   // Step 2 state
   const [dailyRate, setDailyRate] = useState(0);
-  const [deposit, setDeposit] = useState(0);
-  const [additionalCharges, setAdditionalCharges] = useState(0);
-  const [discount, setDiscount] = useState(0);
+  const [deposit, setDeposit] = useState<number | "">("");
+  const [additionalCharges, setAdditionalCharges] = useState<number | "">("");
+  const [discount, setDiscount] = useState<number | "">("");
   const [notes, setNotes] = useState("");
   const [status, setStatus] = useState<"booked" | "active">("booked");
   const [pickupKm, setPickupKm] = useState<number>(0);
@@ -96,7 +96,7 @@ export default function NewRentalClient({ vehicles, customers, guarantors, activ
   const { days, subtotal } = startDate && endDate && dailyRate > 0
     ? calculateRentalAmount(startDate, endDate, dailyRate, selectedVehicle?.rate_tiers)
     : { days: 0, subtotal: 0 };
-  const total = subtotal + additionalCharges - discount;
+  const total = subtotal + (additionalCharges || 0) - (discount || 0);
 
   async function handleStep1Next() {
     if (!vehicleId || !customerId || !guarantorId || !startDate || !endDate) {
@@ -139,9 +139,9 @@ export default function NewRentalClient({ vehicles, customers, guarantors, activ
         start_date: startDate,
         end_date: endDate,
         daily_rate: dailyRate,
-        deposit,
-        additional_charges: additionalCharges,
-        discount,
+        deposit: deposit || 0,
+        additional_charges: additionalCharges || 0,
+        discount: discount || 0,
         pickup_km: pickupKm,
         km_limit: kmLimit,
         extra_km_rate: extraKmRate,
@@ -340,15 +340,15 @@ export default function NewRentalClient({ vehicles, customers, guarantors, activ
               </div>
               <div>
                 <label className="form-label">Deposit (LKR)</label>
-                <input type="number" className="form-input" value={deposit} onChange={e => setDeposit(+e.target.value)} />
+                <input type="number" className="form-input" value={deposit} onChange={e => setDeposit(e.target.value === "" ? "" : +e.target.value)} />
               </div>
               <div>
                 <label className="form-label">Additional Charges (LKR)</label>
-                <input type="number" className="form-input" value={additionalCharges} onChange={e => setAdditionalCharges(+e.target.value)} />
+                <input type="number" className="form-input" value={additionalCharges} onChange={e => setAdditionalCharges(e.target.value === "" ? "" : +e.target.value)} />
               </div>
               <div>
                 <label className="form-label">Discount (LKR)</label>
-                <input type="number" className="form-input" value={discount} onChange={e => setDiscount(+e.target.value)} />
+                <input type="number" className="form-input" value={discount} onChange={e => setDiscount(e.target.value === "" ? "" : +e.target.value)} />
               </div>
               <div>
                 <label className="form-label">Status</label>
