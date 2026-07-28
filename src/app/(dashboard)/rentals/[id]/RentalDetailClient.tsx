@@ -79,11 +79,11 @@ export default function RentalDetailClient({ rental: initial, availableVehicles 
   const baseAmount = Number(rental.subtotal ?? appliedRate * rentalDuration);
   const extraCharges = Number(rental.additional_charges ?? 0);
   const discount = Number(rental.discount ?? 0);
+  const finalAmount = Number(rental.total_amount ?? (baseAmount + extraCharges - discount));
+  const advancePaid = Number((rental as Rental & { amount_paid?: number }).amount_paid ?? rental.advance_paid ?? 0);
   const depositAmount = Number(rental.deposit ?? 0);
   const totalWithDeposit = baseAmount + depositAmount - discount;
   const dueAtPickup = totalWithDeposit - advancePaid;
-  const finalAmount = Number(rental.total_amount ?? (baseAmount + extraCharges - discount));
-  const advancePaid = Number((rental as Rental & { amount_paid?: number }).amount_paid ?? rental.advance_paid ?? 0);
   const securityDepositAmount = Number(rental.security_deposit_amount ?? rental.deposit ?? 0);
   const depositApplied = rental.is_deposit_collected === false ? 0 : securityDepositAmount;
   const netBalance = Number((finalAmount - (advancePaid + depositApplied)).toFixed(2));
