@@ -368,9 +368,10 @@ export async function createRental(data: {
 
   if (error) return { error: error.message };
 
-  // Update vehicle status
+  // Update vehicle status and current_km
   await supabaseAdmin.from('vehicles').update({
     status: data.status === 'active' ? 'rented' : 'booked',
+    ...(data.pickup_km && data.pickup_km > 0 ? { current_km: data.pickup_km } : {}),
   }).eq('id', data.vehicle_id);
 
   revalidatePath('/rentals');

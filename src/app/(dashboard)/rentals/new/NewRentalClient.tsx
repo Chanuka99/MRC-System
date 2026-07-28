@@ -43,6 +43,7 @@ export default function NewRentalClient({ vehicles, customers, guarantors, activ
   const [discount, setDiscount] = useState(0);
   const [notes, setNotes] = useState("");
   const [status, setStatus] = useState<"booked" | "active">("booked");
+  const [pickupKm, setPickupKm] = useState<number>(0);
 
   const selectedVehicle = vehicles.find(v => v.id === vehicleId);
   const selectedCustomer = customers.find(c => c.id === customerId);
@@ -109,11 +110,16 @@ export default function NewRentalClient({ vehicles, customers, guarantors, activ
       }
       setOverlapWarning(false);
       setError(null);
+      setPickupKm(selectedVehicle?.current_km ?? 0);
       setStep(2);
     });
   }
 
   async function handleSubmit() {
+    if (!pickupKm || pickupKm <= 0) {
+      setError("Pickup KM is required.");
+      return;
+    }
     startTransition(async () => {
       const result = await createRental({
         vehicle_id: vehicleId,
@@ -125,6 +131,7 @@ export default function NewRentalClient({ vehicles, customers, guarantors, activ
         deposit,
         additional_charges: additionalCharges,
         discount,
+        pickup_km: pickupKm,
         notes,
         status,
       });
@@ -301,6 +308,10 @@ export default function NewRentalClient({ vehicles, customers, guarantors, activ
                   <option value="booked">Booked (future pickup)</option>
                   <option value="active">Active (pickup now)</option>
                 </select>
+              </div>
+              <div>
+                <label className="form-label">Current KM (Pickup) <span className="text-red-500">*</span></label>
+                <input type="number" className="form-input" value={pickupKm} onChange={e => setPickupKm(+e.target.value)} />
               </div>
               <div>
                 <label className="form-label">Notes</label>
