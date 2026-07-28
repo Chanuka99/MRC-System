@@ -497,7 +497,10 @@ export default function VehicleDetailClient({ vehicle: initial, suppliers, compa
     ? vehicle.rate_tiers.slice(0, 4)
     : DEFAULT_TIERS.map(t => ({ ...t, vehicle_id: vehicle.id }));
   const [rateTiers, setRateTiers] = useState(initTiers);
-  const [editMonthlyRate, setEditMonthlyRate] = useState<number | string>(vehicle.daily_rate * 30 || "");
+  const [editMonthlyRate, setEditMonthlyRate] = useState<number | string>(() => {
+    const monthTier = vehicle.rate_tiers?.find(t => t.days_from === 22);
+    return monthTier ? monthTier.rate_per_day * 30 : vehicle.daily_rate * 30 || "";
+  });
 
   useEffect(() => {
     setVehicle(initial);
