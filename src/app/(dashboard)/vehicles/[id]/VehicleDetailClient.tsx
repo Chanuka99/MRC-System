@@ -935,10 +935,13 @@ export default function VehicleDetailClient({ vehicle: initial, suppliers, compa
                   { label: "Agreement Start Date", value: formatDate(vehicle.agreement_start_date) },
                   { label: "Agreement Period", value: vehicle.agreement_period ? `${vehicle.agreement_period} Months` : "—" },
                   { label: "Renew Date", value: formatDate(vehicle.renew_date) },
-                  { label: "Monthly Rate", value: (vehicle.monthly_rate ?? 0) > 0 ? formatCurrency(vehicle.monthly_rate!) : "—" },
-                  ...(vehicle.source === "Supplier" && (vehicle.supplier_extra_km_rate ?? 0) > 0 ? [
-                    { label: "Supplier Extra KM", value: <span>{formatCurrency(vehicle.supplier_extra_km_rate!)}/km</span> }
+                  ...(vehicle.source === "Supplier" ? [
+                    { label: "Supplier Payment", value: formatCurrency(vehicle.monthly_cost ?? 0) },
+                    ...((vehicle.supplier_extra_km_rate ?? 0) > 0 ? [
+                      { label: "Supplier Extra KM", value: <span>{formatCurrency(vehicle.supplier_extra_km_rate!)}/km</span> }
+                    ] : []),
                   ] : []),
+                  { label: "Monthly Rate", value: (vehicle.monthly_rate ?? 0) > 0 ? formatCurrency(vehicle.monthly_rate!) : "—" },
                   { label: "Next Service KM", value: (vehicle.next_service_km || 0).toLocaleString() + " km" },
                 ].map(f => (
                   <div key={f.label}>
