@@ -36,6 +36,15 @@ export default function NewRentalClient({ vehicles, customers, guarantors, activ
   const startRef = useRef<HTMLDivElement>(null);
   const endRef = useRef<HTMLDivElement>(null);
 
+  const getNowTime = () => {
+    const now = new Date();
+    return `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+  };
+  const [startTime, setStartTime] = useState(getNowTime);
+  const [endTime, setEndTime] = useState(getNowTime);
+  const [editingStartTime, setEditingStartTime] = useState(false);
+  const [editingEndTime, setEditingEndTime] = useState(false);
+
   // Step 2 state
   const [dailyRate, setDailyRate] = useState(0);
   const [deposit, setDeposit] = useState<number | "">("");
@@ -140,6 +149,8 @@ export default function NewRentalClient({ vehicles, customers, guarantors, activ
         guarantor_id: guarantorId,
         start_date: startDate,
         end_date: endDate,
+        start_time: startTime,
+        end_time: endTime,
         daily_rate: dailyRate,
         deposit: deposit || 0,
         extra_day_rate: additionalCharges || 0,
@@ -238,6 +249,45 @@ export default function NewRentalClient({ vehicles, customers, guarantors, activ
                       modifiers={{ booked: bookedDates }}
                       modifiersStyles={{ booked: { backgroundColor: '#fee2e2', color: '#dc2626', borderRadius: '4px', textDecoration: 'line-through' } }}
                       styles={{ months: { width: '100%' }, table: { width: '100%' }, head_cell: { fontSize: '0.6rem', padding: '2px 0' }, cell: { width: '32px', height: '28px', padding: 0 }, day: { width: '26px', height: '26px', margin: '0 auto', borderRadius: '6px', fontSize: '0.72rem' }, nav_button: { width: '24px', height: '24px' }, caption_label: { fontSize: '0.75rem' }, caption: { padding: '2px 0 6px' } }} />
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="form-label">Pickup Time</label>
+                {editingStartTime ? (
+                  <div className="flex items-center gap-1">
+                    <input type="time" className="form-input flex-1" value={startTime} onChange={e => setStartTime(e.target.value)} autoFocus />
+                    <button type="button" className="p-2 text-gray-400 hover:text-green-600" onClick={() => setEditingStartTime(false)} title="Confirm">
+                      <CheckCircle className="w-4 h-4" />
+                    </button>
+                  </div>
+                ) : (
+                  <div className="form-input flex items-center justify-between cursor-default bg-gray-50 text-gray-700">
+                    <span>{startTime}</span>
+                    <button type="button" className="p-1 text-gray-400 hover:text-blue-600" onClick={() => setEditingStartTime(true)} title="Edit time">
+                      <Pencil className="w-4 h-4" />
+                    </button>
+                  </div>
+                )}
+              </div>
+              <div>
+                <label className="form-label">Return Time</label>
+                {editingEndTime ? (
+                  <div className="flex items-center gap-1">
+                    <input type="time" className="form-input flex-1" value={endTime} onChange={e => setEndTime(e.target.value)} autoFocus />
+                    <button type="button" className="p-2 text-gray-400 hover:text-green-600" onClick={() => setEditingEndTime(false)} title="Confirm">
+                      <CheckCircle className="w-4 h-4" />
+                    </button>
+                  </div>
+                ) : (
+                  <div className="form-input flex items-center justify-between cursor-default bg-gray-50 text-gray-700">
+                    <span>{endTime}</span>
+                    <button type="button" className="p-1 text-gray-400 hover:text-blue-600" onClick={() => setEditingEndTime(true)} title="Edit time">
+                      <Pencil className="w-4 h-4" />
+                    </button>
                   </div>
                 )}
               </div>

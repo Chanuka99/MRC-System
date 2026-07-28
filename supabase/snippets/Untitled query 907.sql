@@ -1,7 +1,12 @@
--- Supplier km fields on vehicles
-ALTER TABLE vehicles ADD COLUMN IF NOT EXISTS supplier_km_limit INTEGER DEFAULT 0;
-ALTER TABLE vehicles ADD COLUMN IF NOT EXISTS supplier_extra_km_rate NUMERIC(12,2) DEFAULT 0;
-
--- Customer km fields on rate_tiers
-ALTER TABLE rate_tiers ADD COLUMN IF NOT EXISTS km_limit INTEGER DEFAULT 0;
-ALTER TABLE rate_tiers ADD COLUMN IF NOT EXISTS extra_km_rate NUMERIC(12,2) DEFAULT 0;
+UPDATE vehicles
+SET monthly_rate = (
+  SELECT rate_per_day * 30
+  FROM rate_tiers
+  WHERE vehicle_id = vehicles.id AND days_from = 22
+  LIMIT 1
+)
+WHERE monthly_rate = 0
+  AND EXISTS (
+    SELECT 1 FROM rate_tiers
+    WHERE vehicle_id = vehicles.id AND days_from = 22
+  );

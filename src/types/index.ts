@@ -224,6 +224,8 @@ export interface Rental {
   created_by_user?: User;
   start_date: string;
   end_date: string;
+  start_time?: string;
+  end_time?: string;
   actual_return_date?: string;
   pickup_km: number;
   return_km?: number;

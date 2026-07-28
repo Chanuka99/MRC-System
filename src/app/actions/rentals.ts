@@ -262,6 +262,8 @@ export async function createRental(data: {
   guarantor_id?: string;
   start_date: string;
   end_date: string;
+  start_time?: string;
+  end_time?: string;
   daily_rate: number;
   deposit: number;
   applied_rate?: number;
@@ -321,6 +323,8 @@ export async function createRental(data: {
     created_by: session.id,
     start_date: data.start_date,
     end_date: data.end_date,
+    start_time: data.start_time ?? null,
+    end_time: data.end_time ?? null,
     daily_rate: appliedRate,
     subtotal,
     additional_charges: additional,
@@ -350,6 +354,8 @@ export async function createRental(data: {
     created_by: session.id,
     start_date: data.start_date,
     end_date: data.end_date,
+    start_time: data.start_time ?? null,
+    end_time: data.end_time ?? null,
     daily_rate: appliedRate,
     subtotal,
     additional_charges: additional,
