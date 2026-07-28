@@ -541,6 +541,7 @@ export default function NewVehicleClient({ suppliers, companies }: { suppliers: 
                 className="form-input text-lg font-semibold"
                 placeholder="e.g. 60000"
               />
+              <input type="hidden" name="monthly_rate" value={monthlyRate || ""} />
             </div>
             <p className="text-xs text-gray-400 pb-2">Auto-calculates all 4 tiers below</p>
           </div>

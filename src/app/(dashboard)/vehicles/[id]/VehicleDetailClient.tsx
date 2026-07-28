@@ -498,6 +498,7 @@ export default function VehicleDetailClient({ vehicle: initial, suppliers, compa
     : DEFAULT_TIERS.map(t => ({ ...t, vehicle_id: vehicle.id }));
   const [rateTiers, setRateTiers] = useState(initTiers);
   const [editMonthlyRate, setEditMonthlyRate] = useState<number | string>(() => {
+    if (vehicle.monthly_rate) return vehicle.monthly_rate;
     const monthTier = vehicle.rate_tiers?.find(t => t.days_from === 22);
     return monthTier ? monthTier.rate_per_day * 30 : vehicle.daily_rate * 30 || "";
   });
@@ -581,6 +582,7 @@ export default function VehicleDetailClient({ vehicle: initial, suppliers, compa
     fd.set("brand", editBrand);
     fd.set("model", editModel);
     fd.set("daily_rate", rateTiers.length > 0 ? rateTiers[0].rate_per_day.toString() : "0");
+    fd.set("monthly_rate", String(editMonthlyRate || "0"));
     fd.set("rate_tiers", JSON.stringify(rateTiers.map(t => ({ days_from: t.days_from, days_to: t.days_to, rate_per_day: t.rate_per_day }))));
 
     const customerRate = parseFloat(fd.get('customer_extra_km_rate') as string || '0');
@@ -935,7 +937,7 @@ export default function VehicleDetailClient({ vehicle: initial, suppliers, compa
                   { label: "Agreement Start Date", value: formatDate(vehicle.agreement_start_date) },
                   { label: "Agreement Period", value: vehicle.agreement_period ? `${vehicle.agreement_period} Months` : "—" },
                   { label: "Renew Date", value: formatDate(vehicle.renew_date) },
-                  { label: "Monthly Rate", value: (() => { const t4 = vehicle.rate_tiers?.find(t => t.days_from === 22); return formatCurrency(t4 ? t4.rate_per_day * 30 : vehicle.daily_rate * 30); })() },
+                  { label: "Monthly Rate", value: formatCurrency(vehicle.monthly_rate ?? (() => { const t4 = vehicle.rate_tiers?.find(t => t.days_from === 22); return t4 ? t4.rate_per_day * 30 : vehicle.daily_rate * 30; })()) },
                   ...(vehicle.source === "Supplier" && (vehicle.supplier_extra_km_rate ?? 0) > 0 ? [
                     { label: "Supplier Extra KM", value: <span>{formatCurrency(vehicle.supplier_extra_km_rate!)}/km</span> }
                   ] : []),
@@ -1348,11 +1350,10 @@ export default function VehicleDetailClient({ vehicle: initial, suppliers, compa
 
               <div className="border border-blue-100 rounded-xl p-4 bg-blue-50/40">
                 <p className="text-xs text-blue-500 font-semibold mb-1">Monthly Rate</p>
-                <p className="text-2xl font-bold text-gray-900">{(() => {
+                <p className="text-2xl font-bold text-gray-900">{formatCurrency(vehicle.monthly_rate ?? (() => {
                   const tier4 = vehicle.rate_tiers?.find(t => t.days_from === 22);
-                  const monthly = tier4 ? tier4.rate_per_day * 30 : vehicle.daily_rate * 30;
-                  return formatCurrency(monthly);
-                })()}<span className="text-sm font-normal text-gray-400"> / month</span></p>
+                  return tier4 ? tier4.rate_per_day * 30 : vehicle.daily_rate * 30;
+                })())}<span className="text-sm font-normal text-gray-400"> / month</span></p>
                 <p className="text-xs text-gray-400 mt-1">{formatCurrency(vehicle.daily_rate)} / day</p>
               </div>
 

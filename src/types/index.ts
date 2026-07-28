@@ -139,6 +139,7 @@ export interface Vehicle {
   payment_days?: string;
   supplier_extra_km_rate?: number;
   customer_extra_km_rate?: number;
+  monthly_rate?: number;
   is_active: boolean;
   photos?: VehiclePhoto[];
   rate_tiers?: RateTier[];
