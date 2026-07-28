@@ -134,7 +134,7 @@ export default function RentalsClient({ rentals: initialRentals, total: initialT
 
   const debouncedFilter = useDebounce(applyFilters, 300);
 
-  const hasMore = clientPage * 10 < total;
+  const hasMore = allRentals.length < total;
 
   return (
     <div className="section-card">

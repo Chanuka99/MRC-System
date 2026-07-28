@@ -139,7 +139,7 @@ async function _fetchRentals(params?: {
 const _cachedGetRentals = unstable_cache(
   _fetchRentals,
   ['rentals-list'],
-  { tags: [RENTALS_TAG], revalidate: false },
+  { tags: [RENTALS_TAG], revalidate: 60 },
 );
 
 export async function getRentals(params?: {
