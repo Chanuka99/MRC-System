@@ -11,7 +11,7 @@ export async function GET() {
     const { data, error } = await supabaseAdmin
       .from("rentals")
       .select(
-        "id,start_date,end_date,customer:customers(name,phone,email),vehicle:vehicles(brand,model,reg_number)"
+        "id,start_date,end_date,customer:customers(contact_id, contact:contacts(name, phone, email)),vehicle:vehicles(brand,model,reg_number)"
       )
       .order("created_at", { ascending: false })
       .limit(200);
@@ -22,9 +22,9 @@ export async function GET() {
 
     const rentals = (data ?? []).map((item: any) => ({
       _id: item.id,
-      customerName: item.customer?.name || "",
-      customerPhone: item.customer?.phone || "",
-      customerEmail: item.customer?.email || "",
+      customerName: item.customer?.contact?.name || "",
+      customerPhone: item.customer?.contact?.phone || "",
+      customerEmail: item.customer?.contact?.email || "",
       vehicleName: `${item.vehicle?.brand || ""} ${item.vehicle?.model || ""}`.trim(),
       vehicleRegNo: item.vehicle?.reg_number || "",
       pickupDate: item.start_date,

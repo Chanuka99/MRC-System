@@ -4,6 +4,7 @@ import { unstable_cache } from 'next/cache';
 import { supabaseAdmin } from '@/lib/supabase';
 import { requireAuth } from '@/lib/auth';
 import { RENTALS_TAG } from '@/lib/cache-tags';
+import { flattenContact } from '@/lib/contacts';
 
 export interface DepositEntry {
   id: string;
@@ -22,7 +23,7 @@ async function _fetchRefundableDeposits(params?: { page?: number; pageSize?: num
   const { data, error, count } = await supabaseAdmin
     .from('rentals')
     .select(
-      'id, rental_number, status, deposit, updated_at, customer:customers(name, phone), vehicle:vehicles(reg_number, brand, model)',
+      'id, rental_number, status, deposit, updated_at, customer:customers(contact_id, contact:contacts(name, phone)), vehicle:vehicles(reg_number, brand, model)',
       { count: 'exact' }
     )
     .gt('deposit', 0)
@@ -31,8 +32,13 @@ async function _fetchRefundableDeposits(params?: { page?: number; pageSize?: num
 
   if (error) throw new Error(error.message);
 
+  const flattened = (data ?? []).map((row) => ({
+    ...row,
+    customer: row.customer ? flattenContact(row.customer as Record<string, unknown>) : null,
+  }));
+
   return {
-    data: ((data ?? []) as unknown) as DepositEntry[],
+    data: (flattened as unknown) as DepositEntry[],
     count: count ?? 0,
   };
 }

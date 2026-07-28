@@ -198,7 +198,7 @@ export default function NewRentalClient({ vehicles, customers, guarantors, activ
                   <div className="absolute z-50 mt-1 bg-card border border-border rounded-xl shadow-lg p-2" style={{ width: '260px', fontSize: '0.75rem' }}>
                     <DayPicker mode="single" selected={startDate ? new Date(startDate + 'T12:00:00') : undefined}
                       onSelect={(d) => { if (d) { setStartDate(format(d, 'yyyy-MM-dd')); setShowStartPicker(false); } }}
-                      disabled={[{ before: new Date() }, ...bookedDates]}
+                      disabled={[...bookedDates]}
                       modifiers={{ booked: bookedDates }}
                       modifiersStyles={{ booked: { backgroundColor: '#fee2e2', color: '#dc2626', borderRadius: '4px', textDecoration: 'line-through' } }}
                       styles={{ months: { width: '100%' }, table: { width: '100%' }, head_cell: { fontSize: '0.6rem', padding: '2px 0' }, cell: { width: '32px', height: '28px', padding: 0 }, day: { width: '26px', height: '26px', margin: '0 auto', borderRadius: '6px', fontSize: '0.72rem' }, nav_button: { width: '24px', height: '24px' }, caption_label: { fontSize: '0.75rem' }, caption: { padding: '2px 0 6px' } }} />
