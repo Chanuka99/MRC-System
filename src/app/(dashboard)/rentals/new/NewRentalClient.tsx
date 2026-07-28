@@ -463,6 +463,9 @@ export default function NewRentalClient({ vehicles, customers, guarantors, activ
               <div className="flex justify-between"><span className="text-gray-600">Refundable Deposit</span><span>+ {formatCurrency(deposit || 0)}</span></div>
               {status === "booked" && Number(advancePaid) > 0 && <div className="flex justify-between"><span className="text-gray-600">Advance Paid</span><span className="text-gray-500">−{formatCurrency(Number(advancePaid))}</span></div>}
               <div className="flex justify-between font-bold text-base pt-1 border-t border-blue-200"><span>Total</span><span className="text-blue-700">{formatCurrency(total)}</span></div>
+              {status === "booked" && Number(advancePaid) > 0 && (
+                <div className="flex justify-between font-semibold"><span className="text-gray-700">Due at Pickup</span><span className="text-red-600">{formatCurrency(total - Number(advancePaid))}</span></div>
+              )}
             </div>
 
             {error && <p className="text-sm text-red-600">{error}</p>}
