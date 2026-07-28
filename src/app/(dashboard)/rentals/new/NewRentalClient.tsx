@@ -48,6 +48,7 @@ export default function NewRentalClient({ vehicles, customers, guarantors, activ
   const [kmLimit, setKmLimit] = useState<number>(0);
   const [extraKmRate, setExtraKmRate] = useState<number>(0);
   const [editingKm, setEditingKm] = useState(false);
+  const [editingAddlCharge, setEditingAddlCharge] = useState(false);
 
   const selectedVehicle = vehicles.find(v => v.id === vehicleId);
   const selectedCustomer = customers.find(c => c.id === customerId);
@@ -57,6 +58,7 @@ export default function NewRentalClient({ vehicles, customers, guarantors, activ
     if (selectedVehicle && startDate && endDate) {
       const { days, rateUsed } = calculateRentalAmount(startDate, endDate, selectedVehicle.rate_tiers?.[0]?.rate_per_day ?? 0, selectedVehicle.rate_tiers);
       setDailyRate(rateUsed);
+      setAdditionalCharges(rateUsed);
       const proportionalLimit = Math.round(3000 * days / 30);
       setKmLimit(proportionalLimit);
       setExtraKmRate(selectedVehicle.customer_extra_km_rate ?? 0);
@@ -96,7 +98,7 @@ export default function NewRentalClient({ vehicles, customers, guarantors, activ
   const { days, subtotal } = startDate && endDate && dailyRate > 0
     ? calculateRentalAmount(startDate, endDate, dailyRate, selectedVehicle?.rate_tiers)
     : { days: 0, subtotal: 0 };
-  const total = subtotal + (additionalCharges || 0) - (discount || 0);
+  const total = subtotal - (discount || 0);
 
   async function handleStep1Next() {
     if (!vehicleId || !customerId || !guarantorId || !startDate || !endDate) {
@@ -140,7 +142,7 @@ export default function NewRentalClient({ vehicles, customers, guarantors, activ
         end_date: endDate,
         daily_rate: dailyRate,
         deposit: deposit || 0,
-        additional_charges: additionalCharges || 0,
+        extra_day_rate: additionalCharges || 0,
         discount: discount || 0,
         pickup_km: pickupKm,
         km_limit: kmLimit,
@@ -343,8 +345,22 @@ export default function NewRentalClient({ vehicles, customers, guarantors, activ
                 <input type="number" className="form-input" value={deposit} onChange={e => setDeposit(e.target.value === "" ? "" : +e.target.value)} />
               </div>
               <div>
-                <label className="form-label">Additional Charges (LKR)</label>
-                <input type="number" className="form-input" value={additionalCharges} onChange={e => setAdditionalCharges(e.target.value === "" ? "" : +e.target.value)} />
+                <label className="form-label">Additional Day Charge (LKR)</label>
+                {editingAddlCharge ? (
+                  <div className="flex items-center gap-1">
+                    <input type="number" className="form-input flex-1" value={additionalCharges} onChange={e => setAdditionalCharges(e.target.value === "" ? "" : +e.target.value)} autoFocus />
+                    <button type="button" className="p-2 text-gray-400 hover:text-green-600" onClick={() => setEditingAddlCharge(false)} title="Confirm">
+                      <CheckCircle className="w-4 h-4" />
+                    </button>
+                  </div>
+                ) : (
+                  <div className="form-input flex items-center justify-between cursor-default bg-gray-50 text-gray-700">
+                    <span>{additionalCharges ? formatCurrency(Number(additionalCharges)) : "—"}</span>
+                    <button type="button" className="p-1 text-gray-400 hover:text-blue-600" onClick={() => setEditingAddlCharge(true)} title="Edit rate">
+                      <Pencil className="w-4 h-4" />
+                    </button>
+                  </div>
+                )}
               </div>
               <div>
                 <label className="form-label">Discount (LKR)</label>
@@ -370,10 +386,9 @@ export default function NewRentalClient({ vehicles, customers, guarantors, activ
             {/* Total calculation */}
             <div className="bg-blue-50 border border-blue-100 rounded-xl p-4 space-y-1.5 text-sm">
               <div className="flex justify-between"><span className="text-gray-600">Subtotal ({days}d × {formatCurrency(dailyRate)})</span><span>{formatCurrency(subtotal)}</span></div>
-              {additionalCharges > 0 && <div className="flex justify-between"><span className="text-gray-600">Additional Charges</span><span>+{formatCurrency(additionalCharges)}</span></div>}
               {discount > 0 && <div className="flex justify-between"><span className="text-gray-600">Discount</span><span className="text-green-600">−{formatCurrency(discount)}</span></div>}
               <div className="flex justify-between font-bold text-base pt-1 border-t border-blue-200"><span>Total</span><span className="text-blue-700">{formatCurrency(total)}</span></div>
-              <div className="flex justify-between"><span className="text-gray-600">Deposit</span><span>{formatCurrency(deposit)}</span></div>
+              <div className="flex justify-between"><span className="text-gray-600">Refundable Deposit</span><span>{formatCurrency(deposit || 0)}</span></div>
             </div>
 
             {error && <p className="text-sm text-red-600">{error}</p>}
