@@ -58,6 +58,7 @@ export default function NewRentalClient({ vehicles, customers, guarantors, activ
   const [extraKmRate, setExtraKmRate] = useState<number>(0);
   const [editingKm, setEditingKm] = useState(false);
   const [editingAddlCharge, setEditingAddlCharge] = useState(false);
+  const [editingPickupKm, setEditingPickupKm] = useState(false);
 
   const selectedVehicle = vehicles.find(v => v.id === vehicleId);
   const selectedCustomer = customers.find(c => c.id === customerId);
@@ -427,7 +428,21 @@ export default function NewRentalClient({ vehicles, customers, guarantors, activ
               </div>
               <div>
                 <label className="form-label">Current KM (Pickup) <span className="text-red-500">*</span></label>
-                <input type="number" className="form-input" value={pickupKm} min={selectedVehicle?.current_km ?? 0} onChange={e => setPickupKm(+e.target.value)} />
+                {editingPickupKm ? (
+                  <div className="flex items-center gap-1">
+                    <input type="number" className="form-input flex-1" value={pickupKm} min={selectedVehicle?.current_km ?? 0} onChange={e => setPickupKm(+e.target.value)} autoFocus />
+                    <button type="button" className="p-2 text-gray-400 hover:text-green-600" onClick={() => setEditingPickupKm(false)} title="Confirm">
+                      <CheckCircle className="w-4 h-4" />
+                    </button>
+                  </div>
+                ) : (
+                  <div className="form-input flex items-center justify-between cursor-default bg-gray-50 text-gray-700">
+                    <span>{pickupKm > 0 ? pickupKm.toLocaleString() : "—"}</span>
+                    <button type="button" className="p-1 text-gray-400 hover:text-blue-600" onClick={() => setEditingPickupKm(true)} title="Edit">
+                      <Pencil className="w-4 h-4" />
+                    </button>
+                  </div>
+                )}
               </div>
               <div>
                 <label className="form-label">Notes</label>
