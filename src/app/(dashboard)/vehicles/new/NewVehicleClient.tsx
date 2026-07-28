@@ -158,8 +158,8 @@ export default function NewVehicleClient({ suppliers, companies }: { suppliers: 
         setError("Supplier Extra KM Rate is required.");
         return;
       }
-      if (customerRate < supplierRate) {
-        setError("Extra KM Charge (Customer) must be greater than or equal to Supplier Extra KM Rate.");
+      if (customerRate <= supplierRate) {
+        setError("Extra KM Charge (Customer) must be greater than Supplier Extra KM Rate.");
         return;
       }
     }

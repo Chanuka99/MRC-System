@@ -591,8 +591,8 @@ export default function VehicleDetailClient({ vehicle: initial, suppliers, compa
         setError("Supplier Extra KM Rate is required.");
         return;
       }
-      if (customerRate < supplierRate) {
-        setError("Extra KM Charge (Customer) must be greater than or equal to Supplier Extra KM Rate.");
+      if (customerRate <= supplierRate) {
+        setError("Extra KM Charge (Customer) must be greater than Supplier Extra KM Rate.");
         return;
       }
     }
@@ -1356,7 +1356,7 @@ export default function VehicleDetailClient({ vehicle: initial, suppliers, compa
                   <div className="flex items-center gap-4 text-sm text-gray-700">
                     <span>Charge: <strong>{formatCurrency(vehicle.customer_extra_km_rate!)}/km</strong></span>
                   </div>
-                  {(vehicle.customer_extra_km_rate ?? 0) > 0 && (vehicle.supplier_extra_km_rate ?? 0) > 0 && (vehicle.customer_extra_km_rate! < vehicle.supplier_extra_km_rate!) && (
+                  {(vehicle.customer_extra_km_rate ?? 0) > 0 && (vehicle.supplier_extra_km_rate ?? 0) > 0 && (vehicle.customer_extra_km_rate! <= vehicle.supplier_extra_km_rate!) && (
                     <p className="text-xs text-red-500 mt-2">Warning: Customer extra km rate is lower than supplier rate</p>
                   )}
                 </div>
