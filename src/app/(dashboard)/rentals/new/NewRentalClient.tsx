@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { Vehicle, Customer, Guarantor } from "@/types";
 import { formatCurrency, calculateRentalAmount } from "@/lib/utils";
 import { createRental, checkVehicleOverlap, getVehicleBookedRanges, getBookedDates } from "@/app/actions/rentals";
-import { AlertTriangle, CheckCircle, ChevronRight, ChevronLeft } from "lucide-react";
+import { AlertTriangle, CheckCircle, ChevronRight, ChevronLeft, Pencil } from "lucide-react";
 import { DayPicker } from "react-day-picker";
 import { format } from "date-fns";
 
@@ -44,6 +44,7 @@ export default function NewRentalClient({ vehicles, customers, guarantors, activ
   const [notes, setNotes] = useState("");
   const [status, setStatus] = useState<"booked" | "active">("booked");
   const [pickupKm, setPickupKm] = useState<number>(0);
+  const [editingRate, setEditingRate] = useState(false);
 
   const selectedVehicle = vehicles.find(v => v.id === vehicleId);
   const selectedCustomer = customers.find(c => c.id === customerId);
@@ -291,7 +292,21 @@ export default function NewRentalClient({ vehicles, customers, guarantors, activ
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="form-label">Daily Rate (LKR) <span className="text-red-500">*</span></label>
-                <input type="number" className="form-input" value={dailyRate} onChange={e => setDailyRate(+e.target.value)} />
+                {editingRate ? (
+                  <div className="flex items-center gap-1">
+                    <input type="number" className="form-input flex-1" value={dailyRate} onChange={e => setDailyRate(+e.target.value)} autoFocus />
+                    <button type="button" className="p-2 text-gray-400 hover:text-green-600" onClick={() => setEditingRate(false)} title="Confirm">
+                      <CheckCircle className="w-4 h-4" />
+                    </button>
+                  </div>
+                ) : (
+                  <div className="form-input flex items-center justify-between cursor-default bg-gray-50 text-gray-700">
+                    <span>{formatCurrency(dailyRate)}</span>
+                    <button type="button" className="p-1 text-gray-400 hover:text-blue-600" onClick={() => setEditingRate(true)} title="Edit rate">
+                      <Pencil className="w-4 h-4" />
+                    </button>
+                  </div>
+                )}
                 {selectedVehicle && <p className="text-xs text-gray-400 mt-1">Vehicle default: {formatCurrency(selectedVehicle.daily_rate)}</p>}
               </div>
               <div>
