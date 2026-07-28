@@ -106,7 +106,11 @@ export default function RentalsClient({ rentals: initialRentals, total: initialT
       pageSize: 10,
     });
     if (result.data) {
-      setAllRentals(prev => [...prev, ...result.data]);
+      setAllRentals(prev => {
+        const existingIds = new Set(prev.map(r => r.id));
+        const newItems = result.data.filter(r => !existingIds.has(r.id));
+        return [...prev, ...newItems];
+      });
       setClientPage(nextPage);
       if (result.count !== undefined) setTotal(result.count);
     }
